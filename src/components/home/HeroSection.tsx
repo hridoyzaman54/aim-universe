@@ -6,129 +6,238 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from './AnimatedBackground';
 
-// Interactive floating element that responds to mouse
-const InteractiveCard: React.FC<{
-  image: string;
+// Animated floating educational icon
+const FloatingEducationIcon: React.FC<{
+  icon: React.ReactNode;
   position: string;
   delay: number;
-  baseRotate: number;
-  index: number;
-}> = ({ image, position, delay, baseRotate, index }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  
+  size: string;
+  color: string;
+}> = ({ icon, position, delay, size, color }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100, rotate: 0, scale: 0.5 }}
-      animate={{ 
-        opacity: 1, 
-        y: 0, 
-        rotate: baseRotate,
-        scale: 1
-      }}
+      initial={{ opacity: 0, scale: 0, rotate: -180 }}
+      animate={{ opacity: 1, scale: 1, rotate: 0 }}
       transition={{ 
-        duration: 1.4, 
+        duration: 1.2, 
         delay: 0.5 + delay, 
-        ease: [0.16, 1, 0.3, 1] 
+        ease: [0.16, 1, 0.3, 1],
+        type: 'spring',
+        stiffness: 100
       }}
       className={`absolute ${position} z-20`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <motion.div
         animate={{ 
-          y: isHovered ? 0 : [0, -15, 0],
-          rotate: isHovered ? 0 : [baseRotate, baseRotate + 3, baseRotate],
-          scale: isHovered ? 1.15 : 1
+          y: [0, -20, 0],
+          rotate: [0, 5, -5, 0],
         }}
         transition={{ 
-          duration: isHovered ? 0.3 : 5 + index, 
-          repeat: isHovered ? 0 : Infinity, 
+          duration: 6 + delay * 2, 
+          repeat: Infinity, 
           ease: 'easeInOut' 
         }}
         className="relative group cursor-pointer"
       >
         {/* Glow effect */}
         <motion.div 
-          className="absolute -inset-2 rounded-3xl bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          animate={isHovered ? { scale: [1, 1.2, 1] } : {}}
-          transition={{ duration: 1.5, repeat: Infinity }}
+          className={`absolute -inset-4 rounded-full ${color} blur-2xl opacity-30`}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 3, repeat: Infinity }}
         />
         
-        <div className="relative w-56 h-40 rounded-2xl overflow-hidden shadow-2xl border-4 border-background/80 backdrop-blur-md">
-          <img 
-            src={image} 
-            alt="Students learning"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-          
-          {/* Animated overlay */}
+        {/* Icon container */}
+        <motion.div 
+          whileHover={{ scale: 1.2, rotate: 15 }}
+          className={`relative ${size} rounded-2xl bg-card/80 backdrop-blur-xl border border-border/50 shadow-2xl flex items-center justify-center overflow-hidden group-hover:border-primary/50 transition-colors duration-300`}
+        >
+          {/* Animated gradient background */}
           <motion.div 
-            className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
+            className={`absolute inset-0 ${color} opacity-10`}
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
           />
           
-          {/* Shine sweep effect */}
+          {/* Icon */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
-            animate={isHovered ? { translateX: '200%' } : {}}
-            transition={{ duration: 0.8, ease: 'easeInOut' }}
-          />
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="relative z-10"
+          >
+            {icon}
+          </motion.div>
           
-          {/* Interactive badge */}
-          <AnimatePresence>
-            {isHovered && (
+          {/* Orbiting particles */}
+          {[...Array(3)].map((_, i) => (
+            <motion.div
+              key={i}
+              className={`absolute w-1.5 h-1.5 rounded-full ${color.replace('bg-', 'bg-')}`}
+              animate={{
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: 3 + i,
+                repeat: Infinity,
+                ease: 'linear',
+                delay: i * 0.5,
+              }}
+              style={{
+                transformOrigin: '50% 50%',
+                top: '50%',
+                left: '50%',
+                marginTop: -3,
+                marginLeft: -3,
+              }}
+            >
               <motion.div
-                initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.5, y: 20 }}
-                className="absolute bottom-3 left-3 px-3 py-1.5 bg-background/90 backdrop-blur-sm rounded-full text-xs font-semibold text-foreground flex items-center gap-1"
-              >
-                <Sparkles className="w-3 h-3 text-primary" />
-                Learn More
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-        
-        {/* Floating particles around card */}
-        {isHovered && (
-          <>
-            {[...Array(5)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute w-2 h-2 rounded-full bg-primary"
-                initial={{ 
-                  x: 0, 
-                  y: 0, 
-                  opacity: 1,
-                  scale: 0
-                }}
-                animate={{ 
-                  x: (Math.random() - 0.5) * 100,
-                  y: (Math.random() - 0.5) * 100,
-                  opacity: 0,
-                  scale: 1
-                }}
-                transition={{ 
-                  duration: 1,
-                  delay: i * 0.1,
-                  repeat: Infinity,
-                  repeatDelay: 0.5
-                }}
-                style={{ 
-                  left: '50%', 
-                  top: '50%' 
-                }}
+                animate={{ x: [20 + i * 8, 20 + i * 8] }}
+                className={`w-1.5 h-1.5 rounded-full ${color.replace('bg-', 'bg-')}`}
               />
-            ))}
-          </>
-        )}
+            </motion.div>
+          ))}
+        </motion.div>
+        
+        {/* Floating label */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileHover={{ opacity: 1, y: 0 }}
+          className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-3 py-1 bg-card/90 backdrop-blur-md rounded-full text-xs font-medium text-foreground whitespace-nowrap border border-border/50 shadow-lg"
+        >
+          <motion.span
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            ✨ Explore
+          </motion.span>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
 };
+
+// Animated 3D Book
+const AnimatedBook: React.FC<{ className?: string }> = ({ className }) => (
+  <motion.div className={`relative ${className}`}>
+    <motion.div
+      animate={{ rotateY: [0, 15, 0], rotateX: [0, -5, 0] }}
+      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      className="relative"
+      style={{ transformStyle: 'preserve-3d', perspective: 1000 }}
+    >
+      {/* Book spine */}
+      <div className="absolute left-0 top-0 w-3 h-full bg-primary rounded-l-md shadow-lg" 
+           style={{ transform: 'rotateY(-90deg) translateZ(1.5px)' }} />
+      {/* Book cover */}
+      <div className="w-16 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-r-md rounded-l-sm shadow-xl flex items-center justify-center">
+        <BookOpen className="w-8 h-8 text-primary-foreground" />
+      </div>
+      {/* Pages effect */}
+      <div className="absolute right-1 top-1 bottom-1 w-1 bg-background/50 rounded-r" />
+    </motion.div>
+  </motion.div>
+);
+
+// Animated Lightbulb (idea/learning)
+const AnimatedLightbulb: React.FC<{ className?: string }> = ({ className }) => (
+  <motion.div className={`relative ${className}`}>
+    <motion.div
+      animate={{ scale: [1, 1.05, 1] }}
+      transition={{ duration: 2, repeat: Infinity }}
+    >
+      {/* Glow rays */}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute left-1/2 top-1/2 w-0.5 h-8 bg-gradient-to-t from-yellow-400/60 to-transparent origin-bottom"
+          style={{ rotate: `${i * 45}deg`, translateX: '-50%', translateY: '-100%' }}
+          animate={{ opacity: [0.3, 0.8, 0.3], scaleY: [0.8, 1, 0.8] }}
+          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+        />
+      ))}
+      {/* Bulb */}
+      <motion.div 
+        className="relative w-14 h-14 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-lg flex items-center justify-center"
+        animate={{ 
+          boxShadow: [
+            '0 0 20px rgba(250, 204, 21, 0.4)',
+            '0 0 40px rgba(250, 204, 21, 0.6)',
+            '0 0 20px rgba(250, 204, 21, 0.4)'
+          ]
+        }}
+        transition={{ duration: 2, repeat: Infinity }}
+      >
+        <span className="text-2xl">💡</span>
+      </motion.div>
+    </motion.div>
+  </motion.div>
+);
+
+// Animated Atom (science)
+const AnimatedAtom: React.FC<{ className?: string }> = ({ className }) => (
+  <motion.div className={`relative ${className}`}>
+    <div className="relative w-16 h-16">
+      {/* Nucleus */}
+      <motion.div 
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600"
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+      {/* Electron orbits */}
+      {[0, 60, -60].map((rotation, i) => (
+        <motion.div
+          key={i}
+          className="absolute inset-0"
+          style={{ transform: `rotateZ(${rotation}deg)` }}
+        >
+          <motion.div
+            className="absolute inset-0 border border-cyan-400/30 rounded-full"
+            style={{ transform: 'rotateX(75deg)' }}
+          />
+          <motion.div
+            className="absolute w-2 h-2 rounded-full bg-cyan-400 shadow-lg"
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 2 + i * 0.5, repeat: Infinity, ease: 'linear' }}
+            style={{ 
+              left: '50%', 
+              top: 0, 
+              marginLeft: -4,
+              transformOrigin: '4px 32px'
+            }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+);
+
+// Animated Pencil
+const AnimatedPencil: React.FC<{ className?: string }> = ({ className }) => (
+  <motion.div className={`relative ${className}`}>
+    <motion.div
+      animate={{ rotate: [-5, 5, -5], y: [0, -3, 0] }}
+      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+    >
+      <div className="relative">
+        {/* Pencil body */}
+        <div className="w-4 h-20 bg-gradient-to-b from-yellow-400 to-yellow-500 rounded-t-sm relative">
+          {/* Stripe */}
+          <div className="absolute inset-x-0 top-0 h-full bg-gradient-to-r from-transparent via-yellow-300/50 to-transparent" />
+        </div>
+        {/* Tip */}
+        <div className="w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-l-transparent border-r-transparent border-t-yellow-600" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[3px] border-r-[3px] border-t-[6px] border-l-transparent border-r-transparent border-t-gray-800" />
+        {/* Eraser */}
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-3 bg-pink-400 rounded-t-sm" />
+      </div>
+      {/* Writing effect */}
+      <motion.div
+        className="absolute -bottom-2 left-1/2 w-8 h-0.5 bg-gradient-to-r from-gray-400 to-transparent"
+        animate={{ scaleX: [0, 1, 0], x: [-10, 10, -10] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      />
+    </motion.div>
+  </motion.div>
+);
 
 // Animated text that types out character by character
 const TypedText: React.FC<{ text: string; delay?: number }> = ({ text, delay = 0 }) => {
@@ -217,24 +326,42 @@ const HeroSection: React.FC = () => {
     }
   };
 
-  const floatingCards = [
+  // Floating educational elements configuration
+  const floatingElements = [
     { 
-      image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop',
+      icon: <GraduationCap className="w-8 h-8 text-primary" />,
       delay: 0,
-      position: 'top-28 right-[5%]',
-      rotate: 8
+      position: 'top-28 right-[8%]',
+      size: 'w-20 h-20',
+      color: 'bg-primary'
     },
     { 
-      image: 'https://images.unsplash.com/photo-1544776193-352d25ca82cd?w=400&h=300&fit=crop',
-      delay: 0.15,
-      position: 'top-64 right-[20%]',
-      rotate: -6
+      icon: <BookOpen className="w-8 h-8 text-cyan-500" />,
+      delay: 0.2,
+      position: 'top-48 right-[25%]',
+      size: 'w-16 h-16',
+      color: 'bg-cyan-500'
     },
     { 
-      image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&h=300&fit=crop',
-      delay: 0.3,
-      position: 'bottom-40 right-[8%]',
-      rotate: 4
+      icon: <Sparkles className="w-7 h-7 text-yellow-500" />,
+      delay: 0.4,
+      position: 'top-72 right-[12%]',
+      size: 'w-14 h-14',
+      color: 'bg-yellow-500'
+    },
+    { 
+      icon: <Zap className="w-6 h-6 text-teal-500" />,
+      delay: 0.6,
+      position: 'bottom-48 right-[18%]',
+      size: 'w-12 h-12',
+      color: 'bg-teal-500'
+    },
+    { 
+      icon: <Star className="w-6 h-6 text-accent" />,
+      delay: 0.8,
+      position: 'bottom-32 right-[5%]',
+      size: 'w-14 h-14',
+      color: 'bg-accent'
     },
   ];
 
@@ -327,18 +454,46 @@ const HeroSection: React.FC = () => {
         transition={{ type: 'spring', damping: 30, stiffness: 200 }}
       />
 
-      {/* Floating Image Cards - Desktop Only - Layer 3 */}
+      {/* Floating Educational Elements - Desktop Only - Layer 3 */}
       <motion.div style={{ y: layer3Y }} className="hidden lg:block z-10">
-        {floatingCards.map((card, index) => (
-          <InteractiveCard
+        {floatingElements.map((element, index) => (
+          <FloatingEducationIcon
             key={index}
-            image={card.image}
-            position={card.position}
-            delay={card.delay}
-            baseRotate={card.rotate}
-            index={index}
+            icon={element.icon}
+            position={element.position}
+            delay={element.delay}
+            size={element.size}
+            color={element.color}
           />
         ))}
+        
+        {/* Additional animated educational graphics */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.2, duration: 0.8, type: 'spring' }}
+          className="absolute top-40 right-[35%]"
+        >
+          <AnimatedLightbulb />
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 1.4, duration: 0.8, type: 'spring' }}
+          className="absolute bottom-52 right-[30%]"
+        >
+          <AnimatedAtom />
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0, rotate: -45 }}
+          animate={{ opacity: 1, scale: 1, rotate: 15 }}
+          transition={{ delay: 1.6, duration: 0.8, type: 'spring' }}
+          className="absolute top-60 right-[5%]"
+        >
+          <AnimatedPencil />
+        </motion.div>
       </motion.div>
 
       {/* Main Content */}
