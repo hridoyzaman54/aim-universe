@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Baby, Sparkles, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import ScrollReveal from '@/components/ui/ScrollReveal';
+import ScrollReveal, { StaggerContainer, StaggerItem } from '@/components/ui/ScrollReveal';
 
 const activities = [
   { icon: '🔤', label: 'Alphabets', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=300&h=200&fit=crop' },
@@ -68,7 +68,7 @@ const TinyExplorersPreview: React.FC = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Content */}
-          <ScrollReveal animation="fadeLeft">
+          <ScrollReveal animation="slideLeft">
             <div>
               {/* Badge */}
               <motion.div 
@@ -140,19 +140,10 @@ const TinyExplorersPreview: React.FC = () => {
           </ScrollReveal>
 
           {/* Activity Cards Grid */}
-          <ScrollReveal animation="fadeRight" delay={0.2}>
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              {activities.map((activity, index) => (
+          <StaggerContainer staggerDelay={0.15} className="grid grid-cols-2 gap-3 md:gap-4">
+            {activities.map((activity, index) => (
+              <StaggerItem key={activity.label} animation="bounce">
                 <motion.div
-                  key={activity.label}
-                  initial={{ opacity: 0, y: 40, rotate: index % 2 === 0 ? -5 : 5 }}
-                  whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: 0.3 + index * 0.15,
-                    ease: [0.16, 1, 0.3, 1] as const
-                  }}
                   whileHover={{ 
                     y: -12, 
                     rotate: index % 2 === 0 ? 3 : -3,
@@ -178,9 +169,9 @@ const TinyExplorersPreview: React.FC = () => {
                     <span className="font-display font-bold text-foreground text-sm md:text-base">{activity.label}</span>
                   </div>
                 </motion.div>
-              ))}
-            </div>
-          </ScrollReveal>
+              </StaggerItem>
+            ))}
+          </StaggerContainer>
         </div>
       </div>
     </section>
