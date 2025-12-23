@@ -1,69 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Trophy, Users, Clock, PlayCircle, Star, TrendingUp, Lightbulb, Award, CheckCircle } from 'lucide-react';
-
-// Animated Course Card
-const FloatingCourseCard: React.FC = () => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-20 left-8 z-20"
-    >
-      <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        whileHover={{ scale: 1.05, rotateY: 5 }}
-        className="relative glass-card p-4 w-64 cursor-pointer group"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        {/* Glow effect */}
-        <motion.div 
-          className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-accent/30 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-        />
-        
-        <div className="relative">
-          {/* Course thumbnail */}
-          <div className="relative h-28 rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-primary/20 to-accent/20">
-            
-            {/* Live badge */}
-            <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-destructive/90 backdrop-blur-sm"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground animate-pulse" />
-              <span className="text-[10px] font-semibold text-primary-foreground uppercase">Live</span>
-            </motion.div>
-          </div>
-          
-          {/* Course info */}
-          <h4 className="font-display text-sm font-semibold text-foreground mb-1 line-clamp-1">
-            Advanced Mathematics
-          </h4>
-          <p className="text-xs text-muted-foreground mb-2">Dr. Sarah Johnson</p>
-          
-          {/* Stats row */}
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              234
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              2h 30m
-            </span>
-            <span className="flex items-center gap-1 text-warning">
-              <Star className="w-3 h-3 fill-current" />
-              4.9
-            </span>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-};
+import { Trophy, TrendingUp, Lightbulb, BookOpen, Award, CheckCircle } from 'lucide-react';
 
 // Animated Progress Ring
 const ProgressRing: React.FC = () => {
@@ -287,7 +224,7 @@ const HeroEducationalElements: React.FC = () => {
     <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 pointer-events-none overflow-hidden">
       {/* Allow pointer events on interactive elements */}
       <div className="relative h-full pointer-events-auto px-4">
-        <FloatingCourseCard />
+        
         <ProgressRing />
         <AchievementBadge />
         <KnowledgeCards />
