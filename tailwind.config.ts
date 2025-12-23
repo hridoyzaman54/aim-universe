@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Noto Sans Bengali', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'Noto Sans Bengali', 'system-ui', 'sans-serif'],
+        bangla: ['Noto Sans Bengali', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

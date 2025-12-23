@@ -150,6 +150,12 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   useEffect(() => {
     document.documentElement.lang = language;
+    // Apply Bangla font class when Bangla is selected
+    if (language === 'bn') {
+      document.documentElement.classList.add('font-bangla');
+    } else {
+      document.documentElement.classList.remove('font-bangla');
+    }
   }, [language]);
 
   return (
