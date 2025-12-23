@@ -4,6 +4,7 @@ import { Brain, Video, Heart, Tv, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import TiltCard from '@/components/ui/TiltCard';
 
 const features = [
   {
@@ -78,52 +79,50 @@ const FeaturesSection: React.FC = () => {
               delay={index * 0.1}
             >
               <Link to={feature.link}>
-                <motion.div
-                  whileHover={{ y: -12, scale: 1.02 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
-                  className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-500 hover:shadow-elevated h-full"
+                <TiltCard
+                  className="h-full"
+                  glowColor="hsl(var(--primary))"
+                  tiltIntensity={10}
+                  glowIntensity={0.15}
                 >
-                  {/* Image with Zoom Effect */}
-                  <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden">
-                    <img
-                      src={feature.image}
-                      alt={t(feature.titleKey)}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
-                    
-                    {/* Icon Badge */}
-                    <div className="absolute top-4 left-4 w-12 md:w-14 h-12 md:h-14 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-                      <feature.icon className="w-6 md:w-7 h-6 md:h-7 text-primary-foreground" />
+                  <div className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer h-full">
+                    {/* Image with Zoom Effect */}
+                    <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden">
+                      <img
+                        src={feature.image}
+                        alt={t(feature.titleKey)}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
+                      
+                      {/* Icon Badge */}
+                      <div className="absolute top-4 left-4 w-12 md:w-14 h-12 md:h-14 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+                        <feature.icon className="w-6 md:w-7 h-6 md:h-7 text-primary-foreground" />
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-4 md:p-6">
+                      <h3 className="font-display text-lg md:text-xl font-semibold mb-2 md:mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                        {t(feature.titleKey)}
+                      </h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2">
+                        {t(feature.descKey)}
+                      </p>
+
+                      {/* Learn More with Arrow Animation */}
+                      <div className="flex items-center text-primary text-sm font-medium">
+                        <span>{t('common.learnMore')}</span>
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <ArrowRight className="w-4 h-4 ml-1" />
+                        </motion.div>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Content */}
-                  <div className="p-4 md:p-6">
-                    <h3 className="font-display text-lg md:text-xl font-semibold mb-2 md:mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
-                      {t(feature.titleKey)}
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2">
-                      {t(feature.descKey)}
-                    </p>
-
-                    {/* Learn More with Arrow Animation */}
-                    <div className="flex items-center text-primary text-sm font-medium">
-                      <span>{t('common.learnMore')}</span>
-                      <motion.div
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      >
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </motion.div>
-                    </div>
-                  </div>
-
-                  {/* Hover Glow Effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent" />
-                  </div>
-                </motion.div>
+                </TiltCard>
               </Link>
             </ScrollReveal>
           ))}
