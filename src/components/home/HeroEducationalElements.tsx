@@ -26,18 +26,6 @@ const FloatingCourseCard: React.FC = () => {
         <div className="relative">
           {/* Course thumbnail */}
           <div className="relative h-28 rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-primary/20 to-accent/20">
-            <motion.div 
-              className="absolute inset-0 flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
-            >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center backdrop-blur-sm"
-              >
-                <PlayCircle className="w-6 h-6 text-primary-foreground" />
-              </motion.div>
-            </motion.div>
             
             {/* Live badge */}
             <motion.div
