@@ -75,18 +75,19 @@ const AIChatbot: React.FC = () => {
 
   return (
     <>
-      {/* Sticky header AIMbot launcher */}
-      <div className="fixed top-4 right-4 sm:right-6 z-[120] flex items-center gap-2">
+      {/* Bottom sticky AIMbot launcher */}
+      <div className="fixed bottom-6 left-6 z-[120] flex flex-col items-start gap-2">
+        {/* Welcome bubble */}
         <AnimatePresence>
           {showWelcome && !isOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -6, scale: 0.98 }}
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.98 }}
-              transition={{ duration: 0.18 }}
-              className="relative mr-1"
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="relative mb-1"
             >
-              <div className="relative bg-card border border-border rounded-2xl rounded-tr-sm px-4 py-3 shadow-xl max-w-[260px]">
+              <div className="relative bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-xl max-w-[240px]">
                 <button
                   type="button"
                   onClick={() => setShowWelcome(false)}
@@ -100,46 +101,80 @@ const AIChatbot: React.FC = () => {
                   <Sparkles className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-foreground">
-                      Hi! I am <span className="text-primary font-semibold">AIMbot</span>.
+                      Hi! I'm <span className="text-primary font-semibold">AIMbot</span> ✨
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Your friend — click my head to chat.
+                      Your friendly learning companion! Click me to chat~
                     </p>
                   </div>
                 </div>
 
-                {/* Bubble tail */}
-                <div className="absolute -right-2 top-5 w-3 h-3 bg-card border-r border-t border-border rotate-45" />
+                {/* Bubble tail pointing down-left */}
+                <div className="absolute -bottom-2 left-6 w-4 h-4 bg-card border-r border-b border-border rotate-45" />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <motion.button
-          type="button"
-          onClick={handleOpen}
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.96 }}
-          aria-label="Open AIMbot chat"
-          className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-accent shadow-lg flex items-center justify-center"
-        >
-          <motion.div
-            animate={{ rotate: [0, 8, -8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
-          >
-            <Bot className="w-6 h-6 text-primary-foreground" />
-          </motion.div>
-        </motion.button>
+        {/* AIMbot button with label */}
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              className="flex items-center gap-3"
+            >
+              <motion.button
+                type="button"
+                onClick={handleOpen}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Open AIMbot chat"
+                className="relative w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent shadow-lg flex items-center justify-center"
+              >
+                {/* Pulse rings */}
+                <motion.span
+                  className="absolute inset-0 rounded-full bg-primary/50"
+                  animate={{ scale: [1, 1.4], opacity: [0.5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                />
+                <motion.span
+                  className="absolute inset-0 rounded-full bg-accent/40"
+                  animate={{ scale: [1, 1.6], opacity: [0.4, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.4 }}
+                />
+
+                <motion.div
+                  animate={{ rotate: [0, 8, -8, 0] }}
+                  transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  <Bot className="w-6 h-6 text-primary-foreground relative z-10" />
+                </motion.div>
+              </motion.button>
+
+              {/* Badge label */}
+              <motion.span
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="px-3 py-1.5 rounded-full bg-card border border-border shadow-md text-sm font-medium text-foreground whitespace-nowrap"
+              >
+                Ask AIMbot
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.98 }}
-            className="fixed top-20 right-4 sm:right-6 z-[130] w-[min(92vw,420px)] h-[min(72vh,560px)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-6 left-6 z-[130] w-[min(92vw,400px)] h-[min(75vh,520px)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-accent/10">
               <div className="flex items-center gap-3">
