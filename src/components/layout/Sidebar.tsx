@@ -22,9 +22,12 @@ import {
   X,
   Accessibility,
   LogIn,
+  User,
+  Shield,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import Logo from '@/components/ui/Logo';
 
@@ -44,6 +47,7 @@ const quickActions = [
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   const { language, setLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const { user, role } = useAuth();
   const location = useLocation();
   const [quickMenuOpen, setQuickMenuOpen] = useState(false);
 
@@ -56,7 +60,16 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
     { path: '/counselling', icon: Heart, label: 'Counselling' },
     { path: '/quest-lab', icon: Gamepad2, label: t('nav.questLab') },
     { path: '/aimverse', icon: Tv, label: t('nav.aimverse') },
-    { path: '/auth', icon: LogIn, label: 'Login' },
+    // Dynamic auth/profile link
+    ...(user 
+      ? [{ path: '/profile', icon: User, label: 'Profile' }]
+      : [{ path: '/auth', icon: LogIn, label: 'Login' }]
+    ),
+    // Admin link for admins
+    ...(role === 'admin' 
+      ? [{ path: '/admin', icon: Shield, label: 'Admin' }]
+      : []
+    ),
   ];
 
   return (
