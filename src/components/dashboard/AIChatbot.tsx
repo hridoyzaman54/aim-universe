@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -13,6 +13,7 @@ interface Message {
 
 const AIChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Hi! I\'m your AI learning assistant. How can I help you today?' }
   ]);
@@ -88,8 +89,52 @@ const AIChatbot: React.FC = () => {
     }
   };
 
+  const handleOpenChat = () => {
+    setShowWelcome(false);
+    setIsOpen(true);
+  };
+
   return (
     <>
+      {/* Welcome Dialogue Bubble */}
+      <AnimatePresence>
+        {showWelcome && !isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="fixed bottom-24 right-6 z-50"
+          >
+            <div className="relative bg-card border border-border rounded-2xl rounded-br-sm p-4 shadow-xl max-w-[220px]">
+              {/* Close button */}
+              <button
+                onClick={() => setShowWelcome(false)}
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
+              >
+                <X className="w-3 h-3 text-muted-foreground" />
+              </button>
+              
+              {/* Content */}
+              <div className="flex items-start gap-2">
+                <Sparkles className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Hi! I'm <span className="text-primary font-semibold">AIMbot</span> ✨
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Your friendly learning companion! Click me to chat anytime~
+                  </p>
+                </div>
+              </div>
+              
+              {/* Speech bubble tail */}
+              <div className="absolute -bottom-2 right-4 w-4 h-4 bg-card border-r border-b border-border transform rotate-45" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Chat Toggle Button */}
       <AnimatePresence>
         {!isOpen && (
@@ -99,10 +144,15 @@ const AIChatbot: React.FC = () => {
             exit={{ scale: 0 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpenChat}
             className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent shadow-lg flex items-center justify-center"
           >
-            <MessageCircle className="w-6 h-6 text-primary-foreground" />
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
+              <Bot className="w-6 h-6 text-primary-foreground" />
+            </motion.div>
           </motion.button>
         )}
       </AnimatePresence>
