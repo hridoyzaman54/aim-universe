@@ -6,10 +6,10 @@ import { BookOpen, Trophy, Users, Clock, PlayCircle, Star, TrendingUp, Lightbulb
 const FloatingCourseCard: React.FC = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40, rotateY: -15 }}
-      animate={{ opacity: 1, y: 0, rotateY: 0 }}
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-12 right-8 lg:right-16 z-20"
+      className="absolute top-20 left-8 z-20"
     >
       <motion.div
         animate={{ y: [0, -10, 0] }}
@@ -85,10 +85,10 @@ const ProgressRing: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.5, x: 40 }}
-      animate={{ opacity: 1, scale: 1, x: 0 }}
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-1/3 right-4 lg:right-8 z-20"
+      className="absolute top-1/3 left-4 z-20"
     >
       <motion.div
         animate={{ y: [0, 8, 0] }}
@@ -164,7 +164,7 @@ const AchievementBadge: React.FC = () => {
       initial={{ opacity: 0, scale: 0, rotate: -180 }}
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
       transition={{ duration: 1, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute bottom-1/3 right-12 lg:right-24 z-20"
+      className="absolute bottom-1/3 right-8 z-20"
     >
       <motion.div
         animate={{ 
@@ -222,7 +222,7 @@ const KnowledgeCards: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 2.4 }}
-      className="absolute bottom-20 right-4 lg:right-12 z-20 flex gap-2"
+      className="absolute bottom-24 left-8 z-20 flex gap-2"
     >
       {cards.map((card, index) => (
         <motion.div
@@ -259,10 +259,10 @@ const KnowledgeCards: React.FC = () => {
 const NotificationToast: React.FC = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, x: 100, scale: 0.8 }}
+      initial={{ opacity: 0, x: 50, scale: 0.8 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       transition={{ duration: 0.8, delay: 3, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-1/2 right-4 lg:right-8 z-20"
+      className="absolute top-1/2 right-8 z-20"
     >
       <motion.div
         animate={{ x: [0, 5, 0] }}
@@ -296,9 +296,9 @@ const NotificationToast: React.FC = () => {
 // Main component that combines all elements
 const HeroEducationalElements: React.FC = () => {
   return (
-    <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 pointer-events-none">
+    <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 pointer-events-none overflow-hidden">
       {/* Allow pointer events on interactive elements */}
-      <div className="relative h-full pointer-events-auto">
+      <div className="relative h-full pointer-events-auto px-4">
         <FloatingCourseCard />
         <ProgressRing />
         <AchievementBadge />
