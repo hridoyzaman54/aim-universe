@@ -75,8 +75,8 @@ const AIChatbot: React.FC = () => {
 
   return (
     <>
-      {/* Bottom sticky AIMbot launcher */}
-      <div className="fixed bottom-6 left-6 z-[120] flex flex-col items-start gap-2">
+      {/* Bottom-right sticky AIMbot launcher */}
+      <div className="fixed bottom-6 right-6 z-[120] flex flex-col items-end gap-2">
         {/* Welcome bubble */}
         <AnimatePresence>
           {showWelcome && !isOpen && (
@@ -87,7 +87,7 @@ const AIChatbot: React.FC = () => {
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="relative mb-1"
             >
-              <div className="relative bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3 shadow-xl max-w-[240px]">
+              <div className="relative bg-card border border-border rounded-2xl rounded-br-sm px-4 py-3 shadow-xl max-w-[240px]">
                 <button
                   type="button"
                   onClick={() => setShowWelcome(false)}
@@ -109,21 +109,20 @@ const AIChatbot: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Bubble tail pointing down-left */}
-                <div className="absolute -bottom-2 left-6 w-4 h-4 bg-card border-r border-b border-border rotate-45" />
+                {/* Bubble tail pointing down-right */}
+                <div className="absolute -bottom-2 right-6 w-4 h-4 bg-card border-r border-b border-border rotate-45" />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* AIMbot button with label */}
         <AnimatePresence>
           {!isOpen && (
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 flex-row-reverse"
             >
               <motion.button
                 type="button"
@@ -174,7 +173,7 @@ const AIChatbot: React.FC = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 left-6 z-[130] w-[min(92vw,400px)] h-[min(75vh,520px)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            className="fixed bottom-6 right-6 z-[130] w-[min(92vw,400px)] h-[min(75vh,520px)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
             <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-accent/10">
               <div className="flex items-center gap-3">
