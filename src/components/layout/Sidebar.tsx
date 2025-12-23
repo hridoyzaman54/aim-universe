@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -20,8 +20,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
 
-const Sidebar: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
+interface SidebarProps {
+  collapsed: boolean;
+  setCollapsed: (value: boolean) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   const { language, setLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
@@ -44,7 +48,7 @@ const Sidebar: React.FC = () => {
       className="fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border z-50 flex flex-col"
     >
       {/* Logo */}
-      <div className="p-4 flex items-center gap-3 border-b border-sidebar-border">
+      <div className="p-4 flex items-center gap-3 border-b border-sidebar-border h-[72px]">
         <motion.div
           animate={{ rotate: [0, 360] }}
           transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
@@ -58,7 +62,7 @@ const Sidebar: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="overflow-hidden"
+              className="overflow-hidden whitespace-nowrap"
             >
               <h1 className="font-display font-bold text-lg text-foreground">AIM Centre</h1>
               <p className="text-xs text-muted-foreground">360</p>
@@ -79,7 +83,7 @@ const Sidebar: React.FC = () => {
                 whileHover={{ scale: 1.02, x: 4 }}
                 whileTap={{ scale: 0.98 }}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200',
+                  'flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 relative',
                   isActive
                     ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -119,14 +123,14 @@ const Sidebar: React.FC = () => {
           onClick={toggleTheme}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
         >
-          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          {theme === 'dark' ? <Sun className="w-5 h-5 flex-shrink-0" /> : <Moon className="w-5 h-5 flex-shrink-0" />}
           <AnimatePresence>
             {!collapsed && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-sm"
+                className="text-sm whitespace-nowrap"
               >
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </motion.span>
@@ -141,14 +145,14 @@ const Sidebar: React.FC = () => {
           onClick={() => setLanguage(language === 'en' ? 'bn' : 'en')}
           className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
         >
-          <Languages className="w-5 h-5" />
+          <Languages className="w-5 h-5 flex-shrink-0" />
           <AnimatePresence>
             {!collapsed && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-sm"
+                className="text-sm whitespace-nowrap"
               >
                 {language === 'en' ? 'বাংলা' : 'English'}
               </motion.span>
