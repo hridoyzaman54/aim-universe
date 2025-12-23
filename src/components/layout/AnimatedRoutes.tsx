@@ -9,6 +9,9 @@ const Index = lazy(() => import('@/pages/Index'));
 const Courses = lazy(() => import('@/pages/Courses'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const TinyExplorers = lazy(() => import('@/pages/TinyExplorers'));
+const SpecialNeeds = lazy(() => import('@/pages/SpecialNeeds'));
+const Counselling = lazy(() => import('@/pages/Counselling'));
+const Auth = lazy(() => import('@/pages/Auth'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Smooth fade with subtle scale
@@ -244,6 +247,30 @@ const AnimatedRoutes: React.FC = () => {
               element={
                 <AnimatedPage variant="fadeScale">
                   <TinyExplorers />
+                </AnimatedPage>
+              }
+            />
+            <Route
+              path="/special-needs"
+              element={
+                <AnimatedPage variant="slideUp">
+                  <SpecialNeeds />
+                </AnimatedPage>
+              }
+            />
+            <Route
+              path="/counselling"
+              element={
+                <AnimatedPage variant="slideRight">
+                  <Counselling />
+                </AnimatedPage>
+              }
+            />
+            <Route
+              path="/auth"
+              element={
+                <AnimatedPage variant="fadeScale">
+                  <Auth />
                 </AnimatedPage>
               }
             />
