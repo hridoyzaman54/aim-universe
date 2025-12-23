@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -15,6 +15,12 @@ import {
   Moon,
   Languages,
   Sparkles,
+  Plus,
+  Search,
+  MessageCircle,
+  HelpCircle,
+  Mail,
+  X,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -25,10 +31,19 @@ interface SidebarProps {
   setCollapsed: (value: boolean) => void;
 }
 
+const quickActions = [
+  { icon: Search, label: 'Search Courses', href: '/courses' },
+  { icon: BookOpen, label: 'Browse Courses', href: '/courses' },
+  { icon: MessageCircle, label: 'Live Chat', onClick: () => console.log('Open chat') },
+  { icon: HelpCircle, label: 'Help Center', href: '/dashboard' },
+  { icon: Mail, label: 'Contact Us', onClick: () => window.location.href = 'mailto:support@aimcentre.com' },
+];
+
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   const { language, setLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const [quickMenuOpen, setQuickMenuOpen] = useState(false);
 
   const navItems = [
     { path: '/', icon: Home, label: t('nav.home') },
@@ -113,6 +128,87 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
           );
         })}
       </nav>
+
+      {/* Quick Actions Menu */}
+      <div className="px-2 pb-2">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setQuickMenuOpen(!quickMenuOpen)}
+          className={cn(
+            'w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200',
+            quickMenuOpen
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+          )}
+        >
+          <motion.div
+            animate={{ rotate: quickMenuOpen ? 45 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {quickMenuOpen ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+          </motion.div>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.span
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="font-medium text-sm whitespace-nowrap"
+              >
+                Quick Actions
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.button>
+
+        <AnimatePresence>
+          {quickMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="pt-2 space-y-1">
+                {quickActions.map((action) => {
+                  const ActionWrapper = action.href ? Link : 'button';
+                  const wrapperProps = action.href
+                    ? { to: action.href }
+                    : { onClick: action.onClick };
+
+                  return (
+                    <ActionWrapper
+                      key={action.label}
+                      {...(wrapperProps as any)}
+                      onClick={() => {
+                        action.onClick?.();
+                        setQuickMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                    >
+                      <action.icon className="w-4 h-4 flex-shrink-0" />
+                      <AnimatePresence>
+                        {!collapsed && (
+                          <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="text-sm whitespace-nowrap"
+                          >
+                            {action.label}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </ActionWrapper>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Bottom Controls */}
       <div className="p-4 border-t border-sidebar-border space-y-3">
