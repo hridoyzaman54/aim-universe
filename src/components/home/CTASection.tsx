@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import ScrollReveal from '@/components/ui/ScrollReveal';
+import ScrollReveal, { TextReveal, AnimatedCounter } from '@/components/ui/ScrollReveal';
 
 const CTASection: React.FC = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,7 @@ const CTASection: React.FC = () => {
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 md:px-6 text-center">
-        <ScrollReveal animation="scale">
+        <ScrollReveal animation="zoomIn">
           <div className="max-w-3xl mx-auto">
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
@@ -74,11 +74,13 @@ const CTASection: React.FC = () => {
             </motion.div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-primary-foreground mb-4 md:mb-6 px-4">
-              Ready to Start Your Learning Journey?
+              <TextReveal text="Ready to Start Your Learning Journey?" className="inline" />
             </h2>
 
-            <p className="text-base md:text-lg lg:text-xl text-primary-foreground/80 mb-8 md:mb-10 max-w-2xl mx-auto px-4">
-              Join over 50,000 students already learning with AIM Centre 360. 
+            <p className="text-base md:text-lg lg:text-xl text-primary-foreground/80 mb-6 px-4">
+              Join over <AnimatedCounter value={50000} suffix="+" className="font-bold" /> students already learning with AIM Centre 360. 
+            </p>
+            <p className="text-base md:text-lg lg:text-xl text-primary-foreground/80 mb-8 md:mb-10 px-4">
               Start your free trial today.
             </p>
 
