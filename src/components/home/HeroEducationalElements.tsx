@@ -13,7 +13,7 @@ const ProgressRing: React.FC = () => {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 1, delay: 1.8, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-1/3 left-4 z-20"
+      className="absolute top-24 left-1/2 -translate-x-1/2 z-20"
     >
       <motion.div
         animate={{ y: [0, 8, 0] }}
@@ -89,7 +89,7 @@ const AchievementBadge: React.FC = () => {
       initial={{ opacity: 0, scale: 0, rotate: -180 }}
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
       transition={{ duration: 1, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute bottom-1/3 right-8 z-20"
+      className="absolute top-1/2 right-12 -translate-y-1/2 z-20"
     >
       <motion.div
         animate={{ 
@@ -147,7 +147,7 @@ const KnowledgeCards: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 2.4 }}
-      className="absolute bottom-24 left-8 z-20 flex gap-2"
+      className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 flex gap-3"
     >
       {cards.map((card, index) => (
         <motion.div
@@ -187,7 +187,7 @@ const NotificationToast: React.FC = () => {
       initial={{ opacity: 0, x: 50, scale: 0.8 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
       transition={{ duration: 0.8, delay: 3, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-1/2 right-8 z-20"
+      className="absolute top-1/3 left-8 z-20"
     >
       <motion.div
         animate={{ x: [0, 5, 0] }}
