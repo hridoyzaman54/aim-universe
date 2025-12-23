@@ -12,6 +12,7 @@ const TinyExplorers = lazy(() => import('@/pages/TinyExplorers'));
 const SpecialNeeds = lazy(() => import('@/pages/SpecialNeeds'));
 const Counselling = lazy(() => import('@/pages/Counselling'));
 const Auth = lazy(() => import('@/pages/Auth'));
+const ParentAuth = lazy(() => import('@/pages/ParentAuth'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const AdminDashboard = lazy(() => import('@/pages/AdminDashboard'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
@@ -273,6 +274,14 @@ const AnimatedRoutes: React.FC = () => {
               element={
                 <AnimatedPage variant="fadeScale">
                   <Auth />
+                </AnimatedPage>
+              }
+            />
+            <Route
+              path="/parent-auth"
+              element={
+                <AnimatedPage variant="fadeScale">
+                  <ParentAuth />
                 </AnimatedPage>
               }
             />

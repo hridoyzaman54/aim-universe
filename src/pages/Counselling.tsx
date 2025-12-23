@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import Layout from '@/components/layout/Layout';
 import Footer from '@/components/layout/Footer';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import MoodTracker from '@/components/counselling/MoodTracker';
+import AppointmentForm from '@/components/counselling/AppointmentForm';
+import FloatingElements from '@/components/counselling/FloatingElements';
 import { 
-  Calendar, Clock, Video, Phone, MessageSquare, 
-  Users, Heart, Brain, Sparkles, CheckCircle,
-  ArrowRight, Star
+  Sparkles, CheckCircle, Star, Brain, Heart, Users, MessageSquare, Clock
 } from 'lucide-react';
 
 const services = [
@@ -68,41 +64,14 @@ const counsellors = [
   },
 ];
 
-const sessionTypes = [
-  { icon: Video, label: 'Video Call', value: 'video' },
-  { icon: Phone, label: 'Phone Call', value: 'phone' },
-  { icon: MessageSquare, label: 'Chat Session', value: 'chat' },
-];
-
 const Counselling: React.FC = () => {
-  const [selectedService, setSelectedService] = useState<number | null>(null);
-  const [selectedType, setSelectedType] = useState('video');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    date: '',
-    time: '',
-    notes: ''
-  });
-  const { toast } = useToast();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: 'Booking Request Sent!',
-      description: 'We will contact you within 24 hours to confirm your appointment.',
-    });
-    setFormData({ name: '', email: '', phone: '', date: '', time: '', notes: '' });
-    setSelectedService(null);
-  };
-
   return (
     <Layout>
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-background to-primary/20" />
         <div className="absolute inset-0 bg-hero-pattern opacity-30" />
+        <FloatingElements />
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -115,7 +84,12 @@ const Counselling: React.FC = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
             >
-              <Sparkles className="w-4 h-4 text-primary" />
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+              >
+                <Sparkles className="w-4 h-4 text-primary" />
+              </motion.div>
               <span className="text-sm text-primary font-medium">Professional Support</span>
             </motion.div>
             
@@ -128,25 +102,48 @@ const Counselling: React.FC = () => {
             </p>
             
             <div className="flex flex-wrap justify-center gap-6">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-foreground">Licensed Professionals</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-foreground">Confidential Sessions</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-primary" />
-                <span className="text-foreground">Flexible Scheduling</span>
-              </div>
+              {['Licensed Professionals', 'Confidential Sessions', 'Flexible Scheduling'].map((item, i) => (
+                <motion.div
+                  key={item}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="flex items-center gap-2"
+                >
+                  <CheckCircle className="w-5 h-5 text-primary" />
+                  <span className="text-foreground">{item}</span>
+                </motion.div>
+              ))}
             </div>
           </div>
         </motion.div>
       </section>
 
+      {/* Mood Tracker Section */}
+      <section className="py-16 bg-secondary/30 relative overflow-hidden">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+              How Are You <span className="text-primary">Feeling</span>?
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Track your emotions and get personalized support based on how you're feeling
+            </p>
+          </motion.div>
+          
+          <div className="max-w-3xl mx-auto">
+            <MoodTracker />
+          </div>
+        </div>
+      </section>
+
       {/* Services Section */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -170,35 +167,27 @@ const Counselling: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-                onClick={() => setSelectedService(index)}
-                className={`p-6 rounded-2xl cursor-pointer transition-all ${
-                  selectedService === index 
-                    ? 'bg-primary text-primary-foreground border-2 border-primary' 
-                    : 'bg-card border border-border hover:border-primary/50'
-                }`}
+                whileHover={{ y: -5, scale: 1.02 }}
+                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all group"
               >
-                <service.icon className={`w-10 h-10 mb-4 ${
-                  selectedService === index ? 'text-primary-foreground' : 'text-primary'
-                }`} />
-                <h3 className={`text-lg font-semibold mb-2 ${
-                  selectedService === index ? 'text-primary-foreground' : 'text-foreground'
-                }`}>
+                <motion.div
+                  whileHover={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <service.icon className="w-10 h-10 mb-4 text-primary group-hover:scale-110 transition-transform" />
+                </motion.div>
+                <h3 className="text-lg font-semibold mb-2 text-foreground">
                   {service.title}
                 </h3>
-                <p className={`text-sm mb-4 ${
-                  selectedService === index ? 'text-primary-foreground/80' : 'text-muted-foreground'
-                }`}>
+                <p className="text-sm mb-4 text-muted-foreground">
                   {service.description}
                 </p>
-                <div className={`flex items-center justify-between text-sm ${
-                  selectedService === index ? 'text-primary-foreground/80' : 'text-muted-foreground'
-                }`}>
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     {service.duration}
                   </span>
-                  <span className="font-semibold">{service.price}</span>
+                  <span className="font-semibold text-primary">{service.price}</span>
                 </div>
               </motion.div>
             ))}
@@ -207,7 +196,7 @@ const Counselling: React.FC = () => {
       </section>
 
       {/* Counsellors Section */}
-      <section className="py-20">
+      <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -231,11 +220,15 @@ const Counselling: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
                 className="p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all"
               >
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-white">{counsellor.name.charAt(0)}</span>
-                </div>
+                <motion.div 
+                  className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent mx-auto mb-4 flex items-center justify-center"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                >
+                  <span className="text-2xl font-bold text-primary-foreground">{counsellor.name.charAt(0)}</span>
+                </motion.div>
                 <h3 className="text-xl font-semibold text-foreground text-center mb-1">
                   {counsellor.name}
                 </h3>
@@ -265,8 +258,8 @@ const Counselling: React.FC = () => {
         </div>
       </section>
 
-      {/* Booking Form Section */}
-      <section className="py-20 bg-secondary/30">
+      {/* Appointment Booking Section */}
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <motion.div
@@ -283,114 +276,20 @@ const Counselling: React.FC = () => {
               </p>
             </motion.div>
 
-            <motion.form
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              onSubmit={handleSubmit}
               className="p-8 rounded-2xl bg-card border border-border"
             >
-              {/* Session Type */}
-              <div className="mb-8">
-                <Label className="text-foreground mb-4 block">Session Type</Label>
-                <div className="grid grid-cols-3 gap-4">
-                  {sessionTypes.map((type) => (
-                    <button
-                      key={type.value}
-                      type="button"
-                      onClick={() => setSelectedType(type.value)}
-                      className={`p-4 rounded-xl border-2 transition-all ${
-                        selectedType === type.value
-                          ? 'border-primary bg-primary/10'
-                          : 'border-border hover:border-primary/50'
-                      }`}
-                    >
-                      <type.icon className={`w-6 h-6 mx-auto mb-2 ${
-                        selectedType === type.value ? 'text-primary' : 'text-muted-foreground'
-                      }`} />
-                      <span className={`text-sm ${
-                        selectedType === type.value ? 'text-primary font-medium' : 'text-foreground'
-                      }`}>
-                        {type.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-foreground">Full Name</Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Enter your name"
-                    className="bg-secondary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="Enter your email"
-                    className="bg-secondary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-foreground">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="Enter your phone number"
-                    className="bg-secondary/50"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-foreground">Preferred Date</Label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <Input
-                      id="date"
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="bg-secondary/50 pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2 mb-6">
-                <Label htmlFor="notes" className="text-foreground">Additional Notes</Label>
-                <Textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Tell us about your concerns or what you'd like to discuss..."
-                  className="bg-secondary/50 min-h-[120px]"
-                />
-              </div>
-
-              <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90">
-                Request Appointment
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </motion.form>
+              <AppointmentForm />
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20">
+      <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -409,6 +308,7 @@ const Counselling: React.FC = () => {
               { q: 'Are sessions confidential?', a: 'Absolutely. All sessions are strictly confidential. We follow professional ethics guidelines and only share information with your explicit consent.' },
               { q: 'Can I reschedule my appointment?', a: 'Yes, you can reschedule up to 24 hours before your appointment at no extra cost.' },
               { q: 'Do you offer sessions in Bangla?', a: 'Yes, all our counsellors are bilingual and can conduct sessions in either English or Bangla based on your preference.' },
+              { q: 'What is the Student ID and how do parents use it?', a: 'Every student receives a unique ID (format: STU######) upon registration. Parents need this ID to book appointments and track their child\'s progress.' },
             ].map((faq, index) => (
               <motion.div
                 key={index}
@@ -416,7 +316,8 @@ const Counselling: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="p-6 rounded-xl bg-card border border-border"
+                whileHover={{ scale: 1.01 }}
+                className="p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"
               >
                 <h3 className="font-semibold text-foreground mb-2">{faq.q}</h3>
                 <p className="text-muted-foreground">{faq.a}</p>

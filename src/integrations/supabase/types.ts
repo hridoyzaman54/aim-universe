@@ -14,12 +14,148 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          counsellor_name: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          preferred_date: string
+          preferred_time: string | null
+          service_type: string
+          session_type: string
+          status: string
+          student_id: string | null
+          student_name: string | null
+          updated_at: string
+          user_id: string
+          user_type: string
+        }
+        Insert: {
+          counsellor_name?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          preferred_date: string
+          preferred_time?: string | null
+          service_type: string
+          session_type: string
+          status?: string
+          student_id?: string | null
+          student_name?: string | null
+          updated_at?: string
+          user_id: string
+          user_type: string
+        }
+        Update: {
+          counsellor_name?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          preferred_date?: string
+          preferred_time?: string | null
+          service_type?: string
+          session_type?: string
+          status?: string
+          student_id?: string | null
+          student_name?: string | null
+          updated_at?: string
+          user_id?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
+      mood_logs: {
+        Row: {
+          created_at: string
+          id: string
+          mood: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mood: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mood?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      parent_student_links: {
+        Row: {
+          created_at: string
+          id: string
+          parent_user_id: string
+          student_email: string
+          student_id: string
+          student_name: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parent_user_id: string
+          student_email: string
+          student_id: string
+          student_name: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parent_user_id?: string
+          student_email?: string
+          student_id?: string
+          student_name?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
+          student_id: string | null
           updated_at: string
           user_id: string
         }
@@ -28,6 +164,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          student_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -36,6 +173,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          student_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -67,6 +205,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_student_id: { Args: never; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
