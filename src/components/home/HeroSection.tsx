@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from './AnimatedBackground';
+import GradientMesh from './GradientMesh';
 
 // Animated text that types out character by character
 const TypedText: React.FC<{ text: string; delay?: number }> = ({ text, delay = 0 }) => {
@@ -106,6 +107,9 @@ const HeroSection: React.FC = () => {
       onMouseMove={handleMouseMove}
       className="relative min-h-screen min-h-[100dvh] flex items-center overflow-hidden bg-background w-full"
     >
+      {/* Subtle Gradient Mesh Background - Layer 0.5 */}
+      <GradientMesh />
+
       {/* Morphing background blobs - Layer 1 (furthest) */}
       <motion.div style={{ y: layer1Y }} className="absolute inset-0 overflow-hidden pointer-events-none">
         <MorphingBlob className="w-[600px] h-[600px] bg-primary/10 -top-40 -left-40" delay={0} />
