@@ -17,7 +17,6 @@ import Layout from '@/components/layout/Layout';
 import Footer from '@/components/layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import AIChatbot from '@/components/dashboard/AIChatbot';
 
 // Sample enrolled courses
 const enrolledCourses = [
@@ -297,7 +296,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       <Footer />
-      <AIChatbot />
     </Layout>
   );
 };

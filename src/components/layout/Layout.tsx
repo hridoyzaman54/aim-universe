@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import FloatingActionButton from '@/components/ui/FloatingActionButton';
-
+import AIChatbot from '@/components/dashboard/AIChatbot';
 interface SidebarContextType {
   collapsed: boolean;
   setCollapsed: (value: boolean) => void;
@@ -65,6 +65,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Floating Action Button */}
         <FloatingActionButton />
+
+        {/* AI Chatbot - appears on all pages */}
+        <AIChatbot />
       </div>
     </SidebarContext.Provider>
   );
