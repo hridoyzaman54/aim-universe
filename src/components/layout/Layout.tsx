@@ -44,21 +44,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile, sidebarWidth }}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex">
         {/* Fixed Sidebar - always visible on desktop */}
         {!isMobile && (
           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
         )}
         
-        {/* Main content wrapper - pushes content to the right of sidebar */}
-        <div 
-          className="min-h-screen w-full transition-[margin-left] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-          style={{ marginLeft: sidebarWidth }}
+        {/* Main content wrapper - uses flex to fill remaining space */}
+        <main 
+          className="flex-1 min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          style={{ 
+            marginLeft: isMobile ? 0 : sidebarWidth,
+            width: isMobile ? '100%' : `calc(100% - ${sidebarWidth}px)`
+          }}
         >
-          <div className="w-full">
+          <div className="w-full max-w-full overflow-x-hidden">
             {children}
           </div>
-        </div>
+        </main>
 
         {/* Floating Action Button */}
         <FloatingActionButton />

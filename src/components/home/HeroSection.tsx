@@ -201,7 +201,7 @@ const HeroSection: React.FC = () => {
         }}
         className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-16 md:py-20"
       >
-        <div className="max-w-3xl mx-auto lg:mx-0">
+        <div className="max-w-3xl mx-auto lg:ml-4 xl:ml-8">
           {/* Animated Tagline with pulse ring */}
           <motion.div
             initial={{ opacity: 0, x: -60, scale: 0.9 }}

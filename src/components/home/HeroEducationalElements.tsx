@@ -9,7 +9,7 @@ const AchievementBadge: React.FC = () => {
       initial={{ opacity: 0, scale: 0, rotate: -180 }}
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
       transition={{ duration: 1, delay: 2.1, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-1/2 right-12 -translate-y-1/2 z-20"
+      className="z-20"
     >
       <motion.div
         animate={{ 
@@ -67,7 +67,7 @@ const KnowledgeCards: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 2.4 }}
-      className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 flex gap-3"
+      className="z-20 flex gap-3"
     >
       {cards.map((card, index) => (
         <motion.div
@@ -103,36 +103,13 @@ const KnowledgeCards: React.FC = () => {
 // Main component that combines all elements
 const HeroEducationalElements: React.FC = () => {
   return (
-    <div className="hidden lg:block absolute inset-y-0 right-0 w-1/2 pointer-events-none overflow-hidden">
+    <div className="hidden xl:block absolute inset-y-0 right-4 w-[40%] max-w-md pointer-events-none overflow-hidden">
       {/* Allow pointer events on interactive elements */}
-      <div className="relative h-full pointer-events-auto px-4">
+      <div className="relative h-full pointer-events-auto flex flex-col items-center justify-center gap-8">
         
         <AchievementBadge />
         <KnowledgeCards />
         
-        {/* Decorative connecting lines */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
-          <motion.path
-            d="M 100 200 Q 200 300 300 250 T 400 350"
-            fill="none"
-            stroke="hsl(var(--primary))"
-            strokeWidth="1"
-            strokeDasharray="5,5"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.5 }}
-            transition={{ duration: 3, delay: 3 }}
-          />
-          <motion.path
-            d="M 150 400 Q 250 350 350 400"
-            fill="none"
-            stroke="hsl(var(--accent))"
-            strokeWidth="1"
-            strokeDasharray="5,5"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 0.3 }}
-            transition={{ duration: 3, delay: 3.5 }}
-          />
-        </svg>
       </div>
     </div>
   );
