@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from './AnimatedBackground';
 import GradientMesh from './GradientMesh';
+import HeroEducationalElements from './HeroEducationalElements';
 
 // Animated text that types out character by character
 const TypedText: React.FC<{ text: string; delay?: number }> = ({ text, delay = 0 }) => {
@@ -187,6 +188,8 @@ const HeroSection: React.FC = () => {
         transition={{ type: 'spring', damping: 30, stiffness: 200 }}
       />
 
+      {/* Educational Elements on Right Side */}
+      <HeroEducationalElements />
 
       {/* Main Content */}
       <motion.div 
