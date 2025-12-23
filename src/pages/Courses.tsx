@@ -21,6 +21,7 @@ import Footer from '@/components/layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import TiltCard from '@/components/ui/TiltCard';
 
 const categories = [
   { id: 'all', label: 'All Courses', icon: BookOpen },
@@ -322,64 +323,69 @@ const Courses: React.FC = () => {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
-                      <motion.div
-                        whileHover={{ y: -8, scale: 1.02 }}
-                        className="group glass-card overflow-hidden cursor-pointer"
+                      <TiltCard
+                        className="h-full"
+                        glowColor="hsl(var(--primary))"
+                        tiltIntensity={12}
+                        glowIntensity={0.2}
                       >
-                        {/* Thumbnail */}
-                        <div className="relative aspect-video overflow-hidden">
-                          <img
-                            src={course.thumbnail}
-                            alt={course.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <motion.div
-                              initial={{ scale: 0 }}
-                              whileHover={{ scale: 1 }}
-                              className="w-16 h-16 rounded-full bg-primary flex items-center justify-center"
-                            >
-                              <Play className="w-8 h-8 text-primary-foreground ml-1" />
-                            </motion.div>
-                          </div>
-                          <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm text-sm font-semibold text-primary">
-                            {course.price}
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="p-5">
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                            <span className="px-2 py-1 rounded-full bg-secondary">{course.class}</span>
-                            <span className="px-2 py-1 rounded-full bg-secondary">{course.subject}</span>
-                          </div>
-
-                          <h3 className="font-display font-semibold text-lg text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                            {course.title}
-                          </h3>
-
-                          <p className="text-sm text-muted-foreground mb-4">
-                            by {course.instructor}
-                          </p>
-
-                          <div className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-1 text-warning">
-                              <Star className="w-4 h-4 fill-current" />
-                              <span className="font-medium">{course.rating}</span>
+                        <div className="group glass-card overflow-hidden cursor-pointer h-full rounded-xl">
+                          {/* Thumbnail */}
+                          <div className="relative aspect-video overflow-hidden">
+                            <img
+                              src={course.thumbnail}
+                              alt={course.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                whileHover={{ scale: 1.1 }}
+                                className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30"
+                              >
+                                <Play className="w-8 h-8 text-primary-foreground ml-1" />
+                              </motion.div>
                             </div>
-                            <div className="flex items-center gap-3 text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Users className="w-4 h-4" />
-                                {course.students.toLocaleString()}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                {course.duration}
-                              </span>
+                            <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm text-sm font-semibold text-primary border border-primary/20">
+                              {course.price}
                             </div>
                           </div>
+
+                          {/* Content */}
+                          <div className="p-5">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                              <span className="px-2 py-1 rounded-full bg-secondary">{course.class}</span>
+                              <span className="px-2 py-1 rounded-full bg-secondary">{course.subject}</span>
+                            </div>
+
+                            <h3 className="font-display font-semibold text-lg text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                              {course.title}
+                            </h3>
+
+                            <p className="text-sm text-muted-foreground mb-4">
+                              by {course.instructor}
+                            </p>
+
+                            <div className="flex items-center justify-between text-sm">
+                              <div className="flex items-center gap-1 text-warning">
+                                <Star className="w-4 h-4 fill-current" />
+                                <span className="font-medium">{course.rating}</span>
+                              </div>
+                              <div className="flex items-center gap-3 text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Users className="w-4 h-4" />
+                                  {course.students.toLocaleString()}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="w-4 h-4" />
+                                  {course.duration}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </motion.div>
+                      </TiltCard>
                     </motion.div>
                   ))}
                 </AnimatePresence>
