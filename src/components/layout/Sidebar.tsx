@@ -154,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
                 exit={{ opacity: 0 }}
                 className="text-sm whitespace-nowrap"
               >
-                {language === 'en' ? 'বাংলা' : 'English'}
+                {language === 'en' ? <span className="font-bangla">বাংলা</span> : 'English'}
               </motion.span>
             )}
           </AnimatePresence>
