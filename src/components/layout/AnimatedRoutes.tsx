@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import LoadingScreen from './LoadingScreen';
+import CustomCursor from '@/components/ui/CustomCursor';
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('@/pages/Index'));
@@ -120,6 +121,9 @@ const AnimatedRoutes: React.FC = () => {
 
   return (
     <>
+      {/* Custom Cursor */}
+      <CustomCursor />
+      
       <AnimatePresence mode="wait">
         {isLoading && <LoadingScreen key="loading" />}
       </AnimatePresence>

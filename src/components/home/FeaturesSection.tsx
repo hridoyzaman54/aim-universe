@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { Brain, Video, Heart, Tv, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 const features = [
   {
@@ -45,68 +46,46 @@ const FeaturesSection: React.FC = () => {
   });
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
-  const headerY = useTransform(scrollYProgress, [0, 0.5], ['0%', '-10%']);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-secondary/30 relative overflow-hidden">
+    <section ref={sectionRef} className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
       {/* Parallax Background Elements */}
       <motion.div 
         style={{ y: backgroundY }}
         className="absolute inset-0 pointer-events-none"
       >
-        <div className="absolute top-20 left-10 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute top-20 left-10 w-48 md:w-72 h-48 md:h-72 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-64 md:w-96 h-64 md:h-96 rounded-full bg-accent/5 blur-3xl" />
       </motion.div>
 
-      <div className="container mx-auto px-6 relative z-10">
-        {/* Section Header with Parallax */}
-        <motion.div
-          style={{ y: headerY }}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-16"
-        >
-          <motion.h2 
-            className="font-display text-4xl md:text-5xl font-bold mb-4 text-foreground"
-          >
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        {/* Section Header */}
+        <ScrollReveal animation="fadeUp" className="text-center mb-12 md:mb-16">
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
             {t('features.title')}
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3 }}
-            className="text-xl text-muted-foreground max-w-2xl mx-auto"
-          >
+          </h2>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             {t('features.subtitle')}
-          </motion.p>
-        </motion.div>
+          </p>
+        </ScrollReveal>
 
         {/* Features Grid with Staggered Animations */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid sm:grid-cols-2 gap-4 md:gap-8">
           {features.map((feature, index) => (
-            <motion.div
-              key={feature.titleKey}
-              initial={{ opacity: 0, y: 60, rotateX: 10 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ 
-                duration: 0.8, 
-                delay: index * 0.15,
-                ease: [0.16, 1, 0.3, 1]
-              }}
+            <ScrollReveal 
+              key={feature.titleKey} 
+              animation={index % 2 === 0 ? 'fadeLeft' : 'fadeRight'} 
+              delay={index * 0.1}
             >
               <Link to={feature.link}>
                 <motion.div
                   whileHover={{ y: -12, scale: 1.02 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-500 hover:shadow-elevated"
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
+                  className="group relative bg-card border border-border rounded-2xl overflow-hidden cursor-pointer transition-shadow duration-500 hover:shadow-elevated h-full"
                 >
                   {/* Image with Zoom Effect */}
-                  <div className="relative h-56 overflow-hidden">
-                    <motion.img
+                  <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden">
+                    <img
                       src={feature.image}
                       alt={t(feature.titleKey)}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -114,32 +93,22 @@ const FeaturesSection: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
                     
                     {/* Icon Badge */}
-                    <motion.div 
-                      initial={{ scale: 0, rotate: -180 }}
-                      whileInView={{ scale: 1, rotate: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.3 + index * 0.1, type: 'spring' }}
-                      className="absolute top-4 left-4 w-14 h-14 rounded-xl bg-primary flex items-center justify-center shadow-lg"
-                    >
-                      <feature.icon className="w-7 h-7 text-primary-foreground" />
-                    </motion.div>
+                    <div className="absolute top-4 left-4 w-12 md:w-14 h-12 md:h-14 rounded-xl bg-primary flex items-center justify-center shadow-lg">
+                      <feature.icon className="w-6 md:w-7 h-6 md:h-7 text-primary-foreground" />
+                    </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-6">
-                    <h3 className="font-display text-xl font-semibold mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
+                  <div className="p-4 md:p-6">
+                    <h3 className="font-display text-lg md:text-xl font-semibold mb-2 md:mb-3 text-foreground group-hover:text-primary transition-colors duration-300">
                       {t(feature.titleKey)}
                     </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2">
                       {t(feature.descKey)}
                     </p>
 
                     {/* Learn More with Arrow Animation */}
-                    <motion.div 
-                      className="flex items-center text-primary text-sm font-medium"
-                      initial={{ x: 0 }}
-                      whileHover={{ x: 5 }}
-                    >
+                    <div className="flex items-center text-primary text-sm font-medium">
                       <span>{t('common.learnMore')}</span>
                       <motion.div
                         animate={{ x: [0, 5, 0] }}
@@ -147,7 +116,7 @@ const FeaturesSection: React.FC = () => {
                       >
                         <ArrowRight className="w-4 h-4 ml-1" />
                       </motion.div>
-                    </motion.div>
+                    </div>
                   </div>
 
                   {/* Hover Glow Effect */}
@@ -156,7 +125,7 @@ const FeaturesSection: React.FC = () => {
                   </div>
                 </motion.div>
               </Link>
-            </motion.div>
+            </ScrollReveal>
           ))}
         </div>
       </div>
