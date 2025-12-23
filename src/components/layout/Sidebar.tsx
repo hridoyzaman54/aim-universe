@@ -14,17 +14,19 @@ import {
   Sun,
   Moon,
   Languages,
-  Sparkles,
   Plus,
   Search,
   MessageCircle,
   HelpCircle,
   Mail,
   X,
+  Accessibility,
+  LogIn,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
+import Logo from '@/components/ui/Logo';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -36,7 +38,7 @@ const quickActions = [
   { icon: BookOpen, label: 'Browse Courses', href: '/courses' },
   { icon: MessageCircle, label: 'Live Chat', onClick: () => console.log('Open chat') },
   { icon: HelpCircle, label: 'Help Center', href: '/dashboard' },
-  { icon: Mail, label: 'Contact Us', onClick: () => window.location.href = 'mailto:support@aimcentre.com' },
+  { icon: Mail, label: 'Contact Us', onClick: () => window.location.href = 'mailto:support@shikkhok.com' },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
@@ -50,9 +52,11 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
     { path: '/courses', icon: BookOpen, label: t('nav.courses') },
     { path: '/dashboard', icon: LayoutDashboard, label: t('nav.dashboard') },
     { path: '/tiny-explorers', icon: Baby, label: t('nav.tinyExplorers') },
+    { path: '/special-needs', icon: Accessibility, label: 'Special Needs' },
+    { path: '/counselling', icon: Heart, label: 'Counselling' },
     { path: '/quest-lab', icon: Gamepad2, label: t('nav.questLab') },
     { path: '/aimverse', icon: Tv, label: t('nav.aimverse') },
-    { path: '/counseling', icon: Heart, label: t('nav.counseling') },
+    { path: '/auth', icon: LogIn, label: 'Login' },
   ];
 
   return (
@@ -64,26 +68,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
     >
       {/* Logo */}
       <div className="p-4 flex items-center gap-3 border-b border-sidebar-border h-[72px]">
-        <motion.div
-          animate={{ rotate: [0, 360] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center flex-shrink-0"
-        >
-          <Sparkles className="w-6 h-6 text-primary-foreground" />
-        </motion.div>
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="overflow-hidden whitespace-nowrap"
-            >
-              <h1 className="font-display font-bold text-lg text-foreground">AIM Centre</h1>
-              <p className="text-xs text-muted-foreground">360</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <Logo collapsed={collapsed} showText={!collapsed} size="md" />
       </div>
 
       {/* Navigation */}
