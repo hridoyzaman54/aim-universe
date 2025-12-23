@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import LoadingScreen from './LoadingScreen';
@@ -11,64 +11,92 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const TinyExplorers = lazy(() => import('@/pages/TinyExplorers'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
-const pageVariants = {
+// Smooth fade with subtle scale
+const fadeScaleVariants = {
   initial: {
     opacity: 0,
-    y: 30,
     scale: 0.98,
-    filter: 'blur(10px)',
   },
   enter: {
     opacity: 1,
-    y: 0,
     scale: 1,
-    filter: 'blur(0px)',
     transition: {
-      duration: 0.6,
-      ease: [0.22, 1, 0.36, 1] as const,
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
     },
   },
   exit: {
     opacity: 0,
-    y: -30,
     scale: 1.02,
-    filter: 'blur(10px)',
     transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1] as const,
+      duration: 0.3,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
     },
   },
 };
 
-const slideVariants = {
+// Slide from right
+const slideRightVariants = {
   initial: {
     opacity: 0,
-    x: 100,
+    x: 60,
   },
   enter: {
     opacity: 1,
     x: 0,
     transition: {
       duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as const,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
     },
   },
   exit: {
     opacity: 0,
-    x: -100,
+    x: -60,
     transition: {
       duration: 0.3,
-      ease: [0.22, 1, 0.36, 1] as const,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
     },
   },
 };
 
+// Slide up with fade
+const slideUpVariants = {
+  initial: {
+    opacity: 0,
+    y: 40,
+  },
+  enter: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -40,
+    transition: {
+      duration: 0.3,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
+    },
+  },
+};
+
+type TransitionVariant = 'fadeScale' | 'slideRight' | 'slideUp';
+
+const variantMap = {
+  fadeScale: fadeScaleVariants,
+  slideRight: slideRightVariants,
+  slideUp: slideUpVariants,
+};
+
 // Page wrapper with animation
-const AnimatedPage: React.FC<{ children: React.ReactNode; variant?: 'fade' | 'slide' }> = ({ 
-  children, 
-  variant = 'fade' 
-}) => {
-  const variants = variant === 'slide' ? slideVariants : pageVariants;
+const AnimatedPage: React.FC<{ 
+  children: React.ReactNode; 
+  variant?: TransitionVariant;
+}> = ({ children, variant = 'fadeScale' }) => {
+  const variants = variantMap[variant];
   
   return (
     <motion.div
@@ -76,25 +104,44 @@ const AnimatedPage: React.FC<{ children: React.ReactNode; variant?: 'fade' | 'sl
       animate="enter"
       exit="exit"
       variants={variants}
-      className="min-h-screen"
+      className="min-h-screen w-full"
     >
       {children}
     </motion.div>
   );
 };
 
-// Route transition overlay
+// Smooth transition overlay with wipe effect
 const TransitionOverlay: React.FC<{ isVisible: boolean }> = ({ isVisible }) => (
   <AnimatePresence>
     {isVisible && (
-      <motion.div
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        exit={{ scaleY: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{ transformOrigin: 'top' }}
-        className="fixed inset-0 z-50 bg-primary"
-      />
+      <>
+        {/* Primary overlay */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          exit={{ scaleX: 0 }}
+          transition={{ 
+            duration: 0.4, 
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
+          style={{ transformOrigin: 'left' }}
+          className="fixed inset-0 z-[200] bg-primary"
+        />
+        {/* Secondary overlay for depth */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          exit={{ scaleX: 0 }}
+          transition={{ 
+            duration: 0.4, 
+            delay: 0.05,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
+          style={{ transformOrigin: 'left' }}
+          className="fixed inset-0 z-[199] bg-primary/50"
+        />
+      </>
     )}
   </AnimatePresence>
 );
@@ -103,46 +150,67 @@ const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [showOverlay, setShowOverlay] = useState(false);
+  const isFirstRender = useRef(true);
+  const previousPath = useRef(location.pathname);
 
   // Initial loading
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      isFirstRender.current = false;
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  // Route change transition
+  // Route change transition - only trigger on actual navigation
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !isFirstRender.current && previousPath.current !== location.pathname) {
       setShowOverlay(true);
-      const timer = setTimeout(() => setShowOverlay(false), 300);
+      const timer = setTimeout(() => setShowOverlay(false), 400);
+      previousPath.current = location.pathname;
       return () => clearTimeout(timer);
     }
-  }, [location.pathname]);
+    previousPath.current = location.pathname;
+  }, [location.pathname, isLoading]);
 
   return (
     <>
       {/* Custom Cursor */}
       <CustomCursor />
       
+      {/* Loading Screen */}
       <AnimatePresence mode="wait">
         {isLoading && <LoadingScreen key="loading" />}
       </AnimatePresence>
 
+      {/* Transition Overlay */}
       <TransitionOverlay isVisible={showOverlay} />
 
+      {/* Routes with AnimatePresence for exit animations */}
       <AnimatePresence mode="wait">
         <Suspense
           fallback={
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               className="min-h-screen flex items-center justify-center bg-background"
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-              />
+              <div className="flex flex-col items-center gap-4">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full"
+                />
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-muted-foreground text-sm"
+                >
+                  Loading...
+                </motion.p>
+              </div>
             </motion.div>
           }
         >
@@ -150,7 +218,7 @@ const AnimatedRoutes: React.FC = () => {
             <Route
               path="/"
               element={
-                <AnimatedPage>
+                <AnimatedPage variant="fadeScale">
                   <Index />
                 </AnimatedPage>
               }
@@ -158,7 +226,7 @@ const AnimatedRoutes: React.FC = () => {
             <Route
               path="/courses"
               element={
-                <AnimatedPage variant="slide">
+                <AnimatedPage variant="slideRight">
                   <Courses />
                 </AnimatedPage>
               }
@@ -166,7 +234,7 @@ const AnimatedRoutes: React.FC = () => {
             <Route
               path="/dashboard"
               element={
-                <AnimatedPage variant="slide">
+                <AnimatedPage variant="slideUp">
                   <Dashboard />
                 </AnimatedPage>
               }
@@ -174,7 +242,7 @@ const AnimatedRoutes: React.FC = () => {
             <Route
               path="/tiny-explorers"
               element={
-                <AnimatedPage>
+                <AnimatedPage variant="fadeScale">
                   <TinyExplorers />
                 </AnimatedPage>
               }
@@ -182,7 +250,7 @@ const AnimatedRoutes: React.FC = () => {
             <Route
               path="*"
               element={
-                <AnimatedPage>
+                <AnimatedPage variant="fadeScale">
                   <NotFound />
                 </AnimatedPage>
               }
