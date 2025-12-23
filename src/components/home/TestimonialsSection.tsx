@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 const testimonials = [
   {
@@ -44,7 +45,6 @@ const TestimonialsSection: React.FC = () => {
   });
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
-  const quoteScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -58,132 +58,104 @@ const TestimonialsSection: React.FC = () => {
   const goPrev = () => setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-secondary/30 relative overflow-hidden">
+    <section ref={sectionRef} className="py-16 md:py-24 bg-secondary/30 relative overflow-hidden">
       {/* Parallax Background */}
       <motion.div 
         style={{ y: backgroundY }}
         className="absolute inset-0 pointer-events-none"
       >
-        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-64 md:w-96 h-64 md:h-96 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-56 md:w-80 h-56 md:h-80 rounded-full bg-accent/5 blur-3xl" />
       </motion.div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-16"
-        >
-          <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 text-foreground">
+        <ScrollReveal animation="fadeUp" className="text-center mb-10 md:mb-16">
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
             What Our Community Says
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Join thousands of satisfied learners and parents
           </p>
-        </motion.div>
+        </ScrollReveal>
 
         {/* Testimonial Carousel */}
-        <div className="max-w-4xl mx-auto relative">
-          <motion.div style={{ scale: quoteScale }}>
+        <ScrollReveal animation="scale" delay={0.2}>
+          <div className="max-w-4xl mx-auto relative">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, x: 100, rotateY: 10 }}
-                animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                exit={{ opacity: 0, x: -100, rotateY: -10 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="bg-card border border-border rounded-2xl p-8 md:p-12 shadow-card"
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
+                className="bg-card border border-border rounded-2xl p-6 md:p-8 lg:p-12 shadow-card"
               >
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.3, type: 'spring' }}
-                >
-                  <Quote className="w-12 h-12 text-primary/30 mb-6" />
-                </motion.div>
+                <Quote className="w-10 md:w-12 h-10 md:h-12 text-primary/30 mb-4 md:mb-6" />
                 
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-xl md:text-2xl text-foreground leading-relaxed mb-8"
-                >
+                <p className="text-lg md:text-xl lg:text-2xl text-foreground leading-relaxed mb-6 md:mb-8">
                   "{testimonials[currentIndex].quote}"
-                </motion.p>
+                </p>
 
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="flex items-center gap-4"
-                >
+                <div className="flex items-center gap-4">
                   <motion.img
                     whileHover={{ scale: 1.1 }}
                     src={testimonials[currentIndex].image}
                     alt={testimonials[currentIndex].name}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-primary shadow-lg"
+                    className="w-12 md:w-16 h-12 md:h-16 rounded-full object-cover border-2 border-primary shadow-lg"
                   />
                   <div>
-                    <p className="font-display text-lg font-semibold text-foreground">
+                    <p className="font-display text-base md:text-lg font-semibold text-foreground">
                       {testimonials[currentIndex].name}
                     </p>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground text-sm md:text-base">
                       {testimonials[currentIndex].role}
                     </p>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
             </AnimatePresence>
-          </motion.div>
 
-          {/* Navigation */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center justify-center gap-4 mt-8"
-          >
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={goPrev}
-                className="rounded-full border-border hover:border-primary/50"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-            </motion.div>
+            {/* Navigation */}
+            <div className="flex items-center justify-center gap-3 md:gap-4 mt-6 md:mt-8">
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={goPrev}
+                  className="rounded-full border-border hover:border-primary/50 w-10 h-10 md:w-12 md:h-12"
+                >
+                  <ChevronLeft className="w-4 md:w-5 h-4 md:h-5" />
+                </Button>
+              </motion.div>
 
-            <div className="flex gap-2">
-              {testimonials.map((_, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => goTo(index)}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`h-3 rounded-full transition-all duration-500 ${
-                    index === currentIndex ? 'bg-primary w-8' : 'bg-muted w-3 hover:bg-muted-foreground'
-                  }`}
-                />
-              ))}
+              <div className="flex gap-2">
+                {testimonials.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    onClick={() => goTo(index)}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                    className={`h-2 md:h-3 rounded-full transition-all duration-500 ${
+                      index === currentIndex ? 'bg-primary w-6 md:w-8' : 'bg-muted w-2 md:w-3 hover:bg-muted-foreground'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={goNext}
+                  className="rounded-full border-border hover:border-primary/50 w-10 h-10 md:w-12 md:h-12"
+                >
+                  <ChevronRight className="w-4 md:w-5 h-4 md:h-5" />
+                </Button>
+              </motion.div>
             </div>
-
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={goNext}
-                className="rounded-full border-border hover:border-primary/50"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
