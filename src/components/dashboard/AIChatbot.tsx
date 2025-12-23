@@ -10,6 +10,8 @@ interface Message {
   content: string;
 }
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`;
+
 const AIChatbot: React.FC = () => {
   const { toast } = useToast();
 
@@ -19,7 +21,7 @@ const AIChatbot: React.FC = () => {
     {
       role: "assistant",
       content:
-        "Hi! I am AIMbot — your learning friend. Ask me anything about your lessons.",
+        "Hi! I am AIMbot — your learning friend. Ask me anything about your lessons! 📚",
     },
   ]);
   const [input, setInput] = useState("");
@@ -39,28 +41,135 @@ const AIChatbot: React.FC = () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input.trim() };
-    setMessages((prev) => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setInput("");
     setIsLoading(true);
 
+    let assistantContent = "";
+
     try {
-      // IMPORTANT: We intentionally do NOT call OpenAI directly from the browser with a private key.
-      // This needs a backend function (Lovable Cloud) that safely forwards the request.
-      toast({
-        title: "AIMbot not connected yet",
-        description:
-          "To enable real answers, turn on Cloud so AIMbot can call the AI safely.",
-        variant: "destructive",
+      const response = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          messages: newMessages.map(m => ({ role: m.role, content: m.content }))
+        }),
       });
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "I’m ready — but I’m not connected to the AI backend yet. Turn on Cloud and I’ll start answering instantly.",
-        },
-      ]);
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast({
+            title: "Rate Limited",
+            description: "Too many requests. Please wait a moment and try again.",
+            variant: "destructive",
+          });
+          throw new Error("Rate limited");
+        }
+        if (response.status === 402) {
+          toast({
+            title: "Service Unavailable",
+            description: "AI service temporarily unavailable. Please try again later.",
+            variant: "destructive",
+          });
+          throw new Error("Payment required");
+        }
+        throw new Error("Failed to get response");
+      }
+
+      if (!response.body) {
+        throw new Error("No response body");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+
+      // Add empty assistant message to start streaming into
+      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        textBuffer += decoder.decode(value, { stream: true });
+
+        // Process line by line
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (lastMsg?.role === "assistant") {
+                  lastMsg.content = assistantContent;
+                }
+                return updated;
+              });
+            }
+          } catch {
+            // Incomplete JSON, put it back
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+
+      // Final flush
+      if (textBuffer.trim()) {
+        for (let raw of textBuffer.split("\n")) {
+          if (!raw) continue;
+          if (raw.endsWith("\r")) raw = raw.slice(0, -1);
+          if (raw.startsWith(":") || raw.trim() === "") continue;
+          if (!raw.startsWith("data: ")) continue;
+          const jsonStr = raw.slice(6).trim();
+          if (jsonStr === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const updated = [...prev];
+                const lastMsg = updated[updated.length - 1];
+                if (lastMsg?.role === "assistant") {
+                  lastMsg.content = assistantContent;
+                }
+                return updated;
+              });
+            }
+          } catch { /* ignore */ }
+        }
+      }
+
+    } catch (error) {
+      console.error("Chat error:", error);
+      if (!assistantContent) {
+        setMessages(prev => [
+          ...prev.filter(m => !(m.role === "assistant" && m.content === "")),
+          {
+            role: "assistant",
+            content: "I'm having trouble connecting right now. Please try again in a moment! 🔄",
+          },
+        ]);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +213,7 @@ const AIChatbot: React.FC = () => {
                       Hi! I'm <span className="text-primary font-semibold">AIMbot</span> ✨
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Your friendly learning companion! Click me to chat~
+                      Your AI learning companion! Click me to chat~
                     </p>
                   </div>
                 </div>
@@ -182,7 +291,7 @@ const AIChatbot: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="font-display font-semibold text-foreground">AIMbot</h3>
-                  <p className="text-xs text-muted-foreground">Your learning friend</p>
+                  <p className="text-xs text-muted-foreground">AI Learning Assistant</p>
                 </div>
               </div>
               <Button
@@ -232,7 +341,7 @@ const AIChatbot: React.FC = () => {
                 </motion.div>
               ))}
 
-              {isLoading && (
+              {isLoading && messages[messages.length - 1]?.content === "" && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
