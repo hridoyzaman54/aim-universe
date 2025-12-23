@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import TiltCard from '@/components/ui/TiltCard';
 
 const testimonials = [
   {
@@ -89,30 +90,37 @@ const TestimonialsSection: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
-                className="bg-card border border-border rounded-2xl p-6 md:p-8 lg:p-12 shadow-card"
               >
-                <Quote className="w-10 md:w-12 h-10 md:h-12 text-primary/30 mb-4 md:mb-6" />
-                
-                <p className="text-lg md:text-xl lg:text-2xl text-foreground leading-relaxed mb-6 md:mb-8">
-                  "{testimonials[currentIndex].quote}"
-                </p>
+                <TiltCard
+                  glowColor="hsl(var(--primary))"
+                  tiltIntensity={8}
+                  glowIntensity={0.12}
+                >
+                  <div className="bg-card border border-border rounded-2xl p-6 md:p-8 lg:p-12">
+                    <Quote className="w-10 md:w-12 h-10 md:h-12 text-primary/30 mb-4 md:mb-6" />
+                    
+                    <p className="text-lg md:text-xl lg:text-2xl text-foreground leading-relaxed mb-6 md:mb-8">
+                      "{testimonials[currentIndex].quote}"
+                    </p>
 
-                <div className="flex items-center gap-4">
-                  <motion.img
-                    whileHover={{ scale: 1.1 }}
-                    src={testimonials[currentIndex].image}
-                    alt={testimonials[currentIndex].name}
-                    className="w-12 md:w-16 h-12 md:h-16 rounded-full object-cover border-2 border-primary shadow-lg"
-                  />
-                  <div>
-                    <p className="font-display text-base md:text-lg font-semibold text-foreground">
-                      {testimonials[currentIndex].name}
-                    </p>
-                    <p className="text-muted-foreground text-sm md:text-base">
-                      {testimonials[currentIndex].role}
-                    </p>
+                    <div className="flex items-center gap-4">
+                      <motion.img
+                        whileHover={{ scale: 1.1 }}
+                        src={testimonials[currentIndex].image}
+                        alt={testimonials[currentIndex].name}
+                        className="w-12 md:w-16 h-12 md:h-16 rounded-full object-cover border-2 border-primary shadow-lg shadow-primary/20"
+                      />
+                      <div>
+                        <p className="font-display text-base md:text-lg font-semibold text-foreground">
+                          {testimonials[currentIndex].name}
+                        </p>
+                        <p className="text-muted-foreground text-sm md:text-base">
+                          {testimonials[currentIndex].role}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </TiltCard>
               </motion.div>
             </AnimatePresence>
 
