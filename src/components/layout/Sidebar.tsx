@@ -45,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
       initial={false}
       animate={{ width: collapsed ? 80 : 280 }}
       transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-      className="fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border z-50 flex flex-col"
+      className="fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border z-[100] flex flex-col"
     >
       {/* Logo */}
       <div className="p-4 flex items-center gap-3 border-b border-sidebar-border h-[72px]">
