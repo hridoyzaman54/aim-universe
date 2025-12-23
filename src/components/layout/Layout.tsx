@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
+import FloatingActionButton from '@/components/ui/FloatingActionButton';
 
 interface SidebarContextType {
   collapsed: boolean;
@@ -58,6 +59,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {children}
           </div>
         </div>
+
+        {/* Floating Action Button */}
+        <FloatingActionButton />
       </div>
     </SidebarContext.Provider>
   );
