@@ -71,54 +71,40 @@ const TiltCard: React.FC<TiltCardProps> = ({
       className={`relative ${className}`}
     >
       {/* Glow effect */}
-      <motion.div
-        className="absolute -inset-px rounded-xl opacity-0 transition-opacity duration-300 pointer-events-none z-0"
+      <div
+        className="absolute -inset-px rounded-xl pointer-events-none z-0 transition-opacity duration-300"
         style={{
           opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(600px circle at ${glowX.get()}% ${glowY.get()}%, ${glowColor.replace(')', ` / ${glowIntensity})`)}, transparent 40%)`,
-        }}
-        animate={{
-          background: isHovered
-            ? `radial-gradient(600px circle at ${glowX.get()}% ${glowY.get()}%, ${glowColor.replace(')', ` / ${glowIntensity})`)}, transparent 40%)`
-            : 'none',
+          background: `radial-gradient(600px circle at 50% 50%, ${glowColor.replace(')', ` / ${glowIntensity})`)}, hsl(0 0% 0% / 0) 40%)`,
         }}
       />
 
       {/* Border glow */}
-      <motion.div
-        className="absolute -inset-[1px] rounded-xl opacity-0 pointer-events-none z-0"
+      <div
+        className="absolute -inset-[1px] rounded-xl pointer-events-none z-0 transition-opacity duration-300"
         style={{
-          background: `linear-gradient(to bottom right, ${glowColor.replace(')', ' / 0.3)')}, transparent, ${glowColor.replace(')', ' / 0.3)')})`,
+          background: `linear-gradient(to bottom right, ${glowColor.replace(')', ' / 0.3)')}, hsl(0 0% 0% / 0), ${glowColor.replace(')', ' / 0.3)')})`,
           opacity: isHovered ? 1 : 0,
         }}
-        animate={{
-          opacity: isHovered ? 1 : 0,
-        }}
-        transition={{ duration: 0.3 }}
       />
 
       {/* Shine effect on hover */}
-      <motion.div
-        className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none z-10"
+      <div
+        className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none z-10 transition-opacity duration-300"
         style={{
           opacity: isHovered ? 1 : 0,
         }}
       >
         <motion.div
           className="absolute inset-0"
+          initial={{ x: '-100%' }}
+          animate={{ x: isHovered ? '100%' : '-100%' }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
           style={{
-            background: `linear-gradient(105deg, transparent 40%, ${glowColor.replace(')', ' / 0.1)')} 45%, ${glowColor.replace(')', ' / 0.2)')} 50%, ${glowColor.replace(')', ' / 0.1)')} 55%, transparent 60%)`,
-            transform: 'translateX(-100%)',
-          }}
-          animate={{
-            transform: isHovered ? 'translateX(100%)' : 'translateX(-100%)',
-          }}
-          transition={{
-            duration: 0.6,
-            ease: 'easeInOut',
+            background: `linear-gradient(105deg, hsl(0 0% 0% / 0) 40%, ${glowColor.replace(')', ' / 0.1)')} 45%, ${glowColor.replace(')', ' / 0.2)')} 50%, ${glowColor.replace(')', ' / 0.1)')} 55%, hsl(0 0% 0% / 0) 60%)`,
           }}
         />
-      </motion.div>
+      </div>
 
       {/* Card content */}
       <motion.div

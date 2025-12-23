@@ -1,17 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 
 interface SidebarContextType {
   collapsed: boolean;
   setCollapsed: (value: boolean) => void;
   isMobile: boolean;
+  sidebarWidth: number;
 }
 
 const SidebarContext = createContext<SidebarContextType>({
   collapsed: false,
   setCollapsed: () => {},
   isMobile: false,
+  sidebarWidth: 280,
 });
 
 export const useSidebarContext = () => useContext(SidebarContext);
@@ -41,19 +42,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const sidebarWidth = isMobile ? 0 : (collapsed ? 80 : 280);
 
   return (
-    <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile }}>
-      <div className="min-h-screen w-full bg-background relative">
-        {/* Sidebar - rendered directly, it handles its own fixed positioning */}
-        <div className="hidden lg:block">
+    <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile, sidebarWidth }}>
+      <div className="min-h-screen bg-background">
+        {/* Fixed Sidebar - always visible on desktop */}
+        {!isMobile && (
           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-        </div>
+        )}
         
-        {/* Main content - with padding to account for fixed sidebar */}
+        {/* Main content wrapper - pushes content to the right of sidebar */}
         <div 
-          className="min-h-screen transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-          style={{ paddingLeft: sidebarWidth }}
+          className="min-h-screen w-full transition-[margin-left] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          style={{ marginLeft: sidebarWidth }}
         >
-          {children}
+          <div className="w-full">
+            {children}
+          </div>
         </div>
       </div>
     </SidebarContext.Provider>
