@@ -375,7 +375,7 @@ const HeroSection: React.FC = () => {
     <section 
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative min-h-screen flex items-center overflow-hidden bg-background"
+      className="relative min-h-screen min-h-[100dvh] flex items-center overflow-hidden bg-background w-full"
     >
       {/* Morphing background blobs - Layer 1 (furthest) */}
       <motion.div style={{ y: layer1Y }} className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -502,13 +502,11 @@ const HeroSection: React.FC = () => {
           y: contentY, 
           opacity, 
           scale,
-          x: springX,
           rotateX,
-          filter: useTransform(blur, (v) => `blur(${v}px)`)
         }}
-        className="relative z-10 container mx-auto px-6 py-20"
+        className="relative z-10 w-full px-4 sm:px-6 lg:px-8 py-16 md:py-20"
       >
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto lg:mx-0">
           {/* Animated Tagline with pulse ring */}
           <motion.div
             initial={{ opacity: 0, x: -60, scale: 0.9 }}
@@ -543,7 +541,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
-            className="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-foreground leading-tight"
+            className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 text-foreground leading-tight"
           >
             <TypedText text={t('hero.title')} delay={0.3} />
           </motion.h1>
@@ -552,8 +550,8 @@ const HeroSection: React.FC = () => {
           <motion.p
             initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="text-xl md:text-2xl text-muted-foreground font-medium mb-4"
+            transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground font-medium mb-3 md:mb-4"
           >
             {t('hero.subtitle')}
           </motion.p>
@@ -562,8 +560,8 @@ const HeroSection: React.FC = () => {
           <motion.p
             initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="text-lg text-muted-foreground/80 mb-10 max-w-2xl"
+            transition={{ duration: 1, delay: 0.9, ease: [0.16, 1, 0.3, 1] as const }}
+            className="text-sm sm:text-base md:text-lg text-muted-foreground/80 mb-8 md:mb-10 max-w-2xl"
           >
             {t('hero.description')}
           </motion.p>
@@ -572,10 +570,10 @@ const HeroSection: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row items-start gap-4 mb-16"
+            transition={{ duration: 1, delay: 1, ease: [0.16, 1, 0.3, 1] as const }}
+            className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 md:gap-4 mb-12 md:mb-16"
           >
-            <Link to="/courses">
+            <Link to="/courses" className="w-full sm:w-auto">
               <motion.div 
                 whileHover={{ scale: 1.05, y: -3 }} 
                 whileTap={{ scale: 0.97 }}
@@ -589,22 +587,22 @@ const HeroSection: React.FC = () => {
                 />
                 <Button 
                   size="lg" 
-                  className="relative px-8 py-6 text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 shadow-lg"
+                  className="relative w-full sm:w-auto px-6 md:px-8 py-5 md:py-6 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 shadow-lg"
                 >
-                  <span className="relative z-10 flex items-center">
+                  <span className="relative z-10 flex items-center justify-center">
                     {t('hero.cta.explore')}
                     <motion.span
                       className="ml-2"
                       animate={{ x: [0, 5, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-4 md:w-5 h-4 md:h-5" />
                     </motion.span>
                   </span>
                 </Button>
               </motion.div>
             </Link>
-            <Link to="/dashboard">
+            <Link to="/dashboard" className="w-full sm:w-auto">
               <motion.div 
                 whileHover={{ scale: 1.05, y: -3 }} 
                 whileTap={{ scale: 0.97 }}
@@ -613,18 +611,18 @@ const HeroSection: React.FC = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="relative px-8 py-6 text-lg font-semibold border-2 border-foreground/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 backdrop-blur-sm overflow-hidden"
+                  className="relative w-full sm:w-auto px-6 md:px-8 py-5 md:py-6 text-base md:text-lg font-semibold border-2 border-foreground/20 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 backdrop-blur-sm overflow-hidden"
                 >
                   {/* Shine effect */}
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"
                   />
-                  <span className="relative z-10 flex items-center">
+                  <span className="relative z-10 flex items-center justify-center">
                     <motion.span
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <Play className="mr-2 w-5 h-5" />
+                      <Play className="mr-2 w-4 md:w-5 h-4 md:h-5" />
                     </motion.span>
                     {t('hero.cta.start')}
                   </span>
@@ -638,7 +636,7 @@ const HeroSection: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 1.2 }}
-            className="flex flex-wrap gap-6"
+            className="flex flex-wrap gap-3 sm:gap-4 md:gap-6"
           >
             {stats.map((stat, index) => (
               <motion.div
@@ -648,14 +646,14 @@ const HeroSection: React.FC = () => {
                 transition={{ 
                   duration: 0.6, 
                   delay: 1.4 + index * 0.15,
-                  ease: [0.16, 1, 0.3, 1]
+                  ease: [0.16, 1, 0.3, 1] as const
                 }}
                 whileHover={{ 
                   y: -8, 
                   scale: 1.05,
                   transition: { duration: 0.2 }
                 }}
-                className="group relative flex items-center gap-3 bg-secondary/50 backdrop-blur-md rounded-xl px-5 py-4 border border-border/50 cursor-pointer overflow-hidden"
+                className="group relative flex items-center gap-2 md:gap-3 bg-secondary/50 backdrop-blur-md rounded-lg md:rounded-xl px-3 md:px-5 py-2.5 md:py-4 border border-border/50 cursor-pointer overflow-hidden"
               >
                 {/* Hover gradient */}
                 <motion.div 
@@ -663,22 +661,22 @@ const HeroSection: React.FC = () => {
                 />
                 
                 <motion.div 
-                  className={`relative w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center ${stat.color}`}
+                  className={`relative w-8 md:w-12 h-8 md:h-12 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center ${stat.color}`}
                   whileHover={{ rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 0.5 }}
                 >
-                  <stat.icon className="w-6 h-6" />
+                  <stat.icon className="w-4 md:w-6 h-4 md:h-6" />
                 </motion.div>
                 <div className="relative">
                   <motion.p 
-                    className="font-display text-2xl font-bold text-foreground"
+                    className="font-display text-base md:text-2xl font-bold text-foreground"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.6 + index * 0.2 }}
                   >
                     {stat.value}
                   </motion.p>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">{stat.label}</p>
                 </div>
               </motion.div>
             ))}
@@ -686,13 +684,13 @@ const HeroSection: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Enhanced Scroll Indicator */}
+      {/* Enhanced Scroll Indicator - hide on small screens */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2, duration: 0.8 }}
         style={{ opacity }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20"
+        className="absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-20 hidden sm:block"
       >
         <motion.div
           className="flex flex-col items-center gap-2"
