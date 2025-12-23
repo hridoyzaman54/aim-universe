@@ -42,18 +42,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile }}>
-      <div className="min-h-screen flex w-full bg-background">
-        {/* Sidebar - hidden on mobile */}
-        <div className="hidden lg:block">
+      <div className="min-h-screen w-full bg-background">
+        {/* Sidebar - fixed position, hidden on mobile */}
+        <div className="hidden lg:block fixed left-0 top-0 h-screen z-50">
           <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
         </div>
         
-        {/* Main content */}
+        {/* Main content - with margin to account for fixed sidebar */}
         <motion.main
           initial={false}
           animate={{ marginLeft: sidebarWidth }}
           transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-          className="flex-1 min-w-0 w-full transition-all duration-300"
+          className="min-h-screen w-full"
         >
           {children}
         </motion.main>
