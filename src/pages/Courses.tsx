@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -19,17 +19,20 @@ import {
   Download,
   FileText,
   Video,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import Footer from '@/components/layout/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import TiltCard from '@/components/ui/TiltCard';
 import CourseEnrollment from '@/components/courses/CourseEnrollment';
 import CourseMaterials from '@/components/courses/CourseMaterials';
 import CourseVideoPlayer from '@/components/courses/CourseVideoPlayer';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const categories = [
@@ -44,10 +47,10 @@ const categories = [
 
 const classes = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'];
 
-const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Bangla', 'ICT', 'History', 'Geography', 'Arts'];
+const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Bangla', 'ICT', 'History', 'Geography', 'Arts', 'General'];
 
 // Sample courses data with free course
-const coursesData = [
+export const coursesData = [
   {
     id: 0,
     title: 'Introduction to Learning - FREE',
@@ -63,6 +66,13 @@ const coursesData = [
     price: 'FREE',
     isFree: true,
     description: 'Start your learning journey with this comprehensive introduction course. Includes video lessons, downloadable PDFs, and audio podcasts.',
+    lessons: [
+      { id: 'L1', title: 'Welcome & Course Overview', duration: '10:00' },
+      { id: 'L2', title: 'Getting Started with Learning', duration: '15:00' },
+      { id: 'L3', title: 'Study Techniques', duration: '20:00' },
+      { id: 'L4', title: 'Time Management', duration: '18:00' },
+      { id: 'L5', title: 'Note Taking Skills', duration: '12:00' },
+    ],
   },
   {
     id: 1,
@@ -78,6 +88,11 @@ const coursesData = [
     progress: 0,
     price: '৳2,500',
     isFree: false,
+    lessons: [
+      { id: 'L1', title: 'Introduction to Physics', duration: '25:00' },
+      { id: 'L2', title: 'Mechanics Fundamentals', duration: '30:00' },
+      { id: 'L3', title: 'Thermodynamics', duration: '35:00' },
+    ],
   },
   {
     id: 2,
@@ -93,6 +108,11 @@ const coursesData = [
     progress: 0,
     price: '৳2,000',
     isFree: false,
+    lessons: [
+      { id: 'L1', title: 'Algebra Basics', duration: '20:00' },
+      { id: 'L2', title: 'Geometry', duration: '25:00' },
+      { id: 'L3', title: 'Trigonometry', duration: '30:00' },
+    ],
   },
   {
     id: 3,
@@ -108,6 +128,10 @@ const coursesData = [
     progress: 0,
     price: '৳1,500',
     isFree: false,
+    lessons: [
+      { id: 'L1', title: 'Basic Sketching', duration: '15:00' },
+      { id: 'L2', title: 'Color Theory', duration: '20:00' },
+    ],
   },
   {
     id: 4,
@@ -123,13 +147,17 @@ const coursesData = [
     progress: 0,
     price: '৳3,500',
     isFree: false,
+    lessons: [
+      { id: 'L1', title: 'Atomic Structure', duration: '25:00' },
+      { id: 'L2', title: 'Chemical Bonding', duration: '30:00' },
+    ],
   },
   {
     id: 5,
     title: 'Adaptive Learning: Focus Skills',
     category: 'special',
     class: 'All Classes',
-    subject: 'Special Education',
+    subject: 'General',
     instructor: 'Dr. Fatima Begum',
     rating: 5.0,
     students: 890,
@@ -138,6 +166,10 @@ const coursesData = [
     progress: 0,
     price: '৳1,800',
     isFree: false,
+    lessons: [
+      { id: 'L1', title: 'Understanding Focus', duration: '15:00' },
+      { id: 'L2', title: 'Mindfulness Techniques', duration: '20:00' },
+    ],
   },
   {
     id: 6,
@@ -153,16 +185,22 @@ const coursesData = [
     progress: 0,
     price: '৳2,200',
     isFree: false,
+    lessons: [
+      { id: 'L1', title: 'Poetry Analysis', duration: '25:00' },
+      { id: 'L2', title: 'Prose & Fiction', duration: '30:00' },
+    ],
   },
 ];
 
 const Courses: React.FC = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedClass, setSelectedClass] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Enrollment state
   const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
@@ -181,6 +219,44 @@ const Courses: React.FC = () => {
     videoTitle: '',
   });
 
+  // Fetch enrolled courses from Supabase
+  useEffect(() => {
+    const fetchEnrollments = async () => {
+      if (!user) {
+        // Load from localStorage for non-authenticated users
+        const saved = localStorage.getItem('enrolledCourses');
+        if (saved) {
+          setEnrolledCourses(JSON.parse(saved));
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('course_enrollments')
+          .select('course_id')
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        const courseIds = data?.map(e => e.course_id) || [];
+        setEnrolledCourses(courseIds);
+      } catch (error) {
+        console.error('Error fetching enrollments:', error);
+        // Fallback to localStorage
+        const saved = localStorage.getItem('enrolledCourses');
+        if (saved) {
+          setEnrolledCourses(JSON.parse(saved));
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEnrollments();
+  }, [user]);
+
   const filteredCourses = coursesData.filter(course => {
     const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory || course.category === 'all';
     const matchesClass = !selectedClass || course.class === selectedClass || course.class === 'All Classes';
@@ -189,8 +265,40 @@ const Courses: React.FC = () => {
     return matchesCategory && matchesClass && matchesSubject && matchesSearch;
   });
 
-  const handleEnroll = (courseId: number) => {
-    setEnrolledCourses(prev => [...prev, courseId]);
+  const handleEnroll = async (courseId: number) => {
+    const course = coursesData.find(c => c.id === courseId);
+    if (!course) return;
+
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('course_enrollments')
+          .insert({
+            user_id: user.id,
+            course_id: courseId,
+            course_title: course.title,
+          });
+
+        if (error) throw error;
+        
+        setEnrolledCourses(prev => [...prev, courseId]);
+        toast.success(`Enrolled in ${course.title}!`);
+      } catch (error: any) {
+        if (error.code === '23505') {
+          // Already enrolled
+          setEnrolledCourses(prev => [...prev, courseId]);
+        } else {
+          console.error('Error enrolling:', error);
+          toast.error('Failed to enroll. Please try again.');
+        }
+      }
+    } else {
+      // Save to localStorage for non-authenticated users
+      const newEnrollments = [...enrolledCourses, courseId];
+      setEnrolledCourses(newEnrollments);
+      localStorage.setItem('enrolledCourses', JSON.stringify(newEnrollments));
+      toast.success(`Enrolled in ${course.title}!`);
+    }
   };
 
   const isEnrolled = (courseId: number) => enrolledCourses.includes(courseId);
@@ -204,7 +312,12 @@ const Courses: React.FC = () => {
   };
 
   const openVideo = (course: typeof coursesData[0]) => {
-    setVideoModal({ isOpen: true, courseTitle: course.title, videoTitle: 'Chapter 1: Introduction' });
+    const firstLesson = course.lessons?.[0];
+    setVideoModal({ 
+      isOpen: true, 
+      courseTitle: course.title, 
+      videoTitle: firstLesson?.title || 'Chapter 1: Introduction' 
+    });
   };
 
   return (
@@ -374,8 +487,14 @@ const Courses: React.FC = () => {
                   {filteredCourses.length} courses found
                 </p>
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-success" />
-                  {enrolledCourses.length} enrolled
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-success" />
+                      {enrolledCourses.length} enrolled
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -399,46 +518,67 @@ const Courses: React.FC = () => {
                         tiltIntensity={12}
                         glowIntensity={0.2}
                       >
-                        <div className="group glass-card overflow-hidden cursor-pointer h-full rounded-xl flex flex-col">
+                        <div className="group glass-card overflow-hidden h-full rounded-xl flex flex-col">
                           {/* Thumbnail */}
                           <div className="relative aspect-video overflow-hidden">
-                            <img
+                            <motion.img
                               src={course.thumbnail}
                               alt={course.title}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              className="w-full h-full object-cover"
+                              whileHover={{ scale: 1.1 }}
+                              transition={{ duration: 0.5 }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            {/* Hover overlay */}
+                            <motion.div 
+                              className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent flex items-center justify-center"
+                              initial={{ opacity: 0 }}
+                              whileHover={{ opacity: 1 }}
+                              transition={{ duration: 0.3 }}
+                            >
                               <motion.div
                                 initial={{ scale: 0.8, opacity: 0 }}
-                                whileInView={{ scale: 1, opacity: 1 }}
-                                whileHover={{ scale: 1.1 }}
+                                whileHover={{ scale: 1, opacity: 1 }}
                                 className="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30"
                               >
                                 <Play className="w-8 h-8 text-primary-foreground ml-1" />
                               </motion.div>
-                            </div>
+                            </motion.div>
                             
                             {/* Price Badge */}
-                            <div className={`absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-sm text-sm font-semibold border ${
-                              course.isFree 
-                                ? 'bg-success/20 text-success border-success/30' 
-                                : 'bg-background/80 text-primary border-primary/20'
-                            }`}>
+                            <motion.div 
+                              className={`absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-sm text-sm font-semibold border ${
+                                course.isFree 
+                                  ? 'bg-success/20 text-success border-success/30' 
+                                  : 'bg-background/80 text-primary border-primary/20'
+                              }`}
+                              whileHover={{ scale: 1.1 }}
+                            >
                               {course.isFree ? (
                                 <span className="flex items-center gap-1">
                                   <Sparkles className="w-3 h-3" />
                                   FREE
                                 </span>
                               ) : course.price}
-                            </div>
+                            </motion.div>
 
                             {/* Enrolled Badge */}
                             {isEnrolled(course.id) && (
-                              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-success/90 text-success-foreground text-xs font-semibold flex items-center gap-1">
+                              <motion.div 
+                                className="absolute top-3 left-3 px-3 py-1 rounded-full bg-success/90 text-white text-xs font-semibold flex items-center gap-1"
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 500 }}
+                              >
                                 <CheckCircle2 className="w-3 h-3" />
                                 Enrolled
-                              </div>
+                              </motion.div>
                             )}
+
+                            {/* Lesson count badge */}
+                            <div className="absolute bottom-3 left-3 px-2 py-1 rounded-lg bg-background/80 backdrop-blur-sm text-xs font-medium text-foreground flex items-center gap-1">
+                              <Video className="w-3 h-3" />
+                              {course.lessons?.length || 0} lessons
+                            </div>
                           </div>
 
                           {/* Content */}
