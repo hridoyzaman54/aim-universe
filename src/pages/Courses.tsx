@@ -14,7 +14,12 @@ import {
   Clock,
   Play,
   ChevronDown,
-  X
+  X,
+  Sparkles,
+  Download,
+  FileText,
+  Video,
+  CheckCircle2
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import Footer from '@/components/layout/Footer';
@@ -22,6 +27,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import TiltCard from '@/components/ui/TiltCard';
+import CourseEnrollment from '@/components/courses/CourseEnrollment';
+import CourseMaterials from '@/components/courses/CourseMaterials';
+import CourseVideoPlayer from '@/components/courses/CourseVideoPlayer';
+import { toast } from 'sonner';
 
 const categories = [
   { id: 'all', label: 'All Courses', icon: BookOpen },
@@ -37,8 +46,24 @@ const classes = ['Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6
 
 const subjects = ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'Bangla', 'ICT', 'History', 'Geography', 'Arts'];
 
-// Sample courses data
+// Sample courses data with free course
 const coursesData = [
+  {
+    id: 0,
+    title: 'Introduction to Learning - FREE',
+    category: 'all',
+    class: 'All Classes',
+    subject: 'General',
+    instructor: 'AIM Centre Team',
+    rating: 5.0,
+    students: 45000,
+    duration: '15 hours',
+    thumbnail: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=225&fit=crop',
+    progress: 0,
+    price: 'FREE',
+    isFree: true,
+    description: 'Start your learning journey with this comprehensive introduction course. Includes video lessons, downloadable PDFs, and audio podcasts.',
+  },
   {
     id: 1,
     title: 'HSC Physics Complete Course',
@@ -52,6 +77,7 @@ const coursesData = [
     thumbnail: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=400&h=225&fit=crop',
     progress: 0,
     price: '৳2,500',
+    isFree: false,
   },
   {
     id: 2,
@@ -66,6 +92,7 @@ const coursesData = [
     thumbnail: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&h=225&fit=crop',
     progress: 0,
     price: '৳2,000',
+    isFree: false,
   },
   {
     id: 3,
@@ -80,6 +107,7 @@ const coursesData = [
     thumbnail: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=225&fit=crop',
     progress: 0,
     price: '৳1,500',
+    isFree: false,
   },
   {
     id: 4,
@@ -94,6 +122,7 @@ const coursesData = [
     thumbnail: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=225&fit=crop',
     progress: 0,
     price: '৳3,500',
+    isFree: false,
   },
   {
     id: 5,
@@ -108,6 +137,7 @@ const coursesData = [
     thumbnail: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=225&fit=crop',
     progress: 0,
     price: '৳1,800',
+    isFree: false,
   },
   {
     id: 6,
@@ -122,6 +152,7 @@ const coursesData = [
     thumbnail: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=225&fit=crop',
     progress: 0,
     price: '৳2,200',
+    isFree: false,
   },
 ];
 
@@ -132,14 +163,49 @@ const Courses: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  
+  // Enrollment state
+  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([]);
+  const [enrollmentModal, setEnrollmentModal] = useState<{ isOpen: boolean; course: typeof coursesData[0] | null }>({
+    isOpen: false,
+    course: null,
+  });
+  const [materialsModal, setMaterialsModal] = useState<{ isOpen: boolean; courseId: number; courseTitle: string }>({
+    isOpen: false,
+    courseId: 0,
+    courseTitle: '',
+  });
+  const [videoModal, setVideoModal] = useState<{ isOpen: boolean; courseTitle: string; videoTitle: string }>({
+    isOpen: false,
+    courseTitle: '',
+    videoTitle: '',
+  });
 
   const filteredCourses = coursesData.filter(course => {
-    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
-    const matchesClass = !selectedClass || course.class === selectedClass;
+    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory || course.category === 'all';
+    const matchesClass = !selectedClass || course.class === selectedClass || course.class === 'All Classes';
     const matchesSubject = !selectedSubject || course.subject === selectedSubject;
     const matchesSearch = !searchQuery || course.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesClass && matchesSubject && matchesSearch;
   });
+
+  const handleEnroll = (courseId: number) => {
+    setEnrolledCourses(prev => [...prev, courseId]);
+  };
+
+  const isEnrolled = (courseId: number) => enrolledCourses.includes(courseId);
+
+  const openEnrollment = (course: typeof coursesData[0]) => {
+    setEnrollmentModal({ isOpen: true, course });
+  };
+
+  const openMaterials = (course: typeof coursesData[0]) => {
+    setMaterialsModal({ isOpen: true, courseId: course.id, courseTitle: course.title });
+  };
+
+  const openVideo = (course: typeof coursesData[0]) => {
+    setVideoModal({ isOpen: true, courseTitle: course.title, videoTitle: 'Chapter 1: Introduction' });
+  };
 
   return (
     <Layout>
@@ -307,6 +373,10 @@ const Courses: React.FC = () => {
                 <p className="text-muted-foreground">
                   {filteredCourses.length} courses found
                 </p>
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-success" />
+                  {enrolledCourses.length} enrolled
+                </div>
               </div>
 
               <motion.div
@@ -325,11 +395,11 @@ const Courses: React.FC = () => {
                     >
                       <TiltCard
                         className="h-full"
-                        glowColor="hsl(var(--primary))"
+                        glowColor={course.isFree ? 'hsl(var(--success))' : 'hsl(var(--primary))'}
                         tiltIntensity={12}
                         glowIntensity={0.2}
                       >
-                        <div className="group glass-card overflow-hidden cursor-pointer h-full rounded-xl">
+                        <div className="group glass-card overflow-hidden cursor-pointer h-full rounded-xl flex flex-col">
                           {/* Thumbnail */}
                           <div className="relative aspect-video overflow-hidden">
                             <img
@@ -347,13 +417,32 @@ const Courses: React.FC = () => {
                                 <Play className="w-8 h-8 text-primary-foreground ml-1" />
                               </motion.div>
                             </div>
-                            <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-background/80 backdrop-blur-sm text-sm font-semibold text-primary border border-primary/20">
-                              {course.price}
+                            
+                            {/* Price Badge */}
+                            <div className={`absolute top-3 right-3 px-3 py-1 rounded-full backdrop-blur-sm text-sm font-semibold border ${
+                              course.isFree 
+                                ? 'bg-success/20 text-success border-success/30' 
+                                : 'bg-background/80 text-primary border-primary/20'
+                            }`}>
+                              {course.isFree ? (
+                                <span className="flex items-center gap-1">
+                                  <Sparkles className="w-3 h-3" />
+                                  FREE
+                                </span>
+                              ) : course.price}
                             </div>
+
+                            {/* Enrolled Badge */}
+                            {isEnrolled(course.id) && (
+                              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-success/90 text-success-foreground text-xs font-semibold flex items-center gap-1">
+                                <CheckCircle2 className="w-3 h-3" />
+                                Enrolled
+                              </div>
+                            )}
                           </div>
 
                           {/* Content */}
-                          <div className="p-5">
+                          <div className="p-5 flex-1 flex flex-col">
                             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
                               <span className="px-2 py-1 rounded-full bg-secondary">{course.class}</span>
                               <span className="px-2 py-1 rounded-full bg-secondary">{course.subject}</span>
@@ -367,7 +456,7 @@ const Courses: React.FC = () => {
                               by {course.instructor}
                             </p>
 
-                            <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center justify-between text-sm mb-4">
                               <div className="flex items-center gap-1 text-warning">
                                 <Star className="w-4 h-4 fill-current" />
                                 <span className="font-medium">{course.rating}</span>
@@ -382,6 +471,48 @@ const Courses: React.FC = () => {
                                   {course.duration}
                                 </span>
                               </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="mt-auto space-y-2">
+                              {isEnrolled(course.id) ? (
+                                <div className="grid grid-cols-2 gap-2">
+                                  <Button 
+                                    size="sm" 
+                                    onClick={() => openVideo(course)}
+                                    className="w-full"
+                                  >
+                                    <Video className="w-4 h-4 mr-1" />
+                                    Watch
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => openMaterials(course)}
+                                    className="w-full"
+                                  >
+                                    <Download className="w-4 h-4 mr-1" />
+                                    Materials
+                                  </Button>
+                                </div>
+                              ) : (
+                                <Button 
+                                  onClick={() => openEnrollment(course)}
+                                  className={`w-full ${course.isFree ? 'bg-success hover:bg-success/90' : ''}`}
+                                >
+                                  {course.isFree ? (
+                                    <>
+                                      <Sparkles className="w-4 h-4 mr-2" />
+                                      Enroll Free
+                                    </>
+                                  ) : (
+                                    <>
+                                      <GraduationCap className="w-4 h-4 mr-2" />
+                                      Enroll Now
+                                    </>
+                                  )}
+                                </Button>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -406,6 +537,31 @@ const Courses: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {enrollmentModal.course && (
+        <CourseEnrollment
+          course={enrollmentModal.course}
+          isOpen={enrollmentModal.isOpen}
+          onClose={() => setEnrollmentModal({ isOpen: false, course: null })}
+          onEnroll={handleEnroll}
+        />
+      )}
+
+      <CourseMaterials
+        courseId={materialsModal.courseId}
+        courseTitle={materialsModal.courseTitle}
+        isOpen={materialsModal.isOpen}
+        onClose={() => setMaterialsModal({ isOpen: false, courseId: 0, courseTitle: '' })}
+      />
+
+      <CourseVideoPlayer
+        courseTitle={videoModal.courseTitle}
+        videoTitle={videoModal.videoTitle}
+        isOpen={videoModal.isOpen}
+        onClose={() => setVideoModal({ isOpen: false, courseTitle: '', videoTitle: '' })}
+      />
+
       <Footer />
     </Layout>
   );
