@@ -65,6 +65,75 @@ export type Database = {
         }
         Relationships: []
       }
+      course_enrollments: {
+        Row: {
+          completed_at: string | null
+          course_id: number
+          course_title: string
+          enrolled_at: string
+          id: string
+          progress: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: number
+          course_title: string
+          enrolled_at?: string
+          id?: string
+          progress?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: number
+          course_title?: string
+          enrolled_at?: string
+          id?: string
+          progress?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      lesson_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          course_id: number
+          created_at: string
+          id: string
+          lesson_id: string
+          lesson_title: string
+          updated_at: string
+          user_id: string
+          watched_seconds: number | null
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          course_id: number
+          created_at?: string
+          id?: string
+          lesson_id: string
+          lesson_title: string
+          updated_at?: string
+          user_id: string
+          watched_seconds?: number | null
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          course_id?: number
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          lesson_title?: string
+          updated_at?: string
+          user_id?: string
+          watched_seconds?: number | null
+        }
+        Relationships: []
+      }
       mood_logs: {
         Row: {
           created_at: string
