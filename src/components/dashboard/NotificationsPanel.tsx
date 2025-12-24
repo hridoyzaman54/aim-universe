@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, BookOpen, Trophy, Calendar, 
-  CheckCircle, X, AlertCircle, Sparkles 
+  CheckCircle, X, AlertCircle, Sparkles,
+  Megaphone, Info, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,17 +18,19 @@ interface Notification {
   type: string;
   read: boolean;
   created_at: string;
+  isAnnouncement?: boolean;
+  priority?: string;
 }
 
 const NotificationsPanel: React.FC = () => {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Mock notifications for demo
   const mockNotifications: Notification[] = [
     {
-      id: '1',
+      id: 'mock-1',
       title: 'New Assignment',
       message: 'Chapter 6 Quiz has been assigned. Due in 3 days.',
       type: 'assignment',
@@ -35,7 +38,7 @@ const NotificationsPanel: React.FC = () => {
       created_at: new Date().toISOString()
     },
     {
-      id: '2',
+      id: 'mock-2',
       title: 'Course Update',
       message: 'New lesson added to Introduction to Programming',
       type: 'course',
@@ -43,7 +46,7 @@ const NotificationsPanel: React.FC = () => {
       created_at: new Date(Date.now() - 3600000).toISOString()
     },
     {
-      id: '3',
+      id: 'mock-3',
       title: 'Achievement Unlocked!',
       message: "You've completed 10 lessons this week! 🎉",
       type: 'achievement',
@@ -51,7 +54,7 @@ const NotificationsPanel: React.FC = () => {
       created_at: new Date(Date.now() - 86400000).toISOString()
     },
     {
-      id: '4',
+      id: 'mock-4',
       title: 'Live Class Reminder',
       message: 'Physics live session starts in 30 minutes',
       type: 'reminder',
@@ -62,22 +65,56 @@ const NotificationsPanel: React.FC = () => {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      if (!user) {
-        setNotifications(mockNotifications);
-        setLoading(false);
-        return;
-      }
+      setLoading(true);
+      let allNotifications: Notification[] = [];
 
       try {
-        const { data, error } = await supabase
-          .from('notifications')
+        // Fetch announcements (visible to all)
+        const { data: announcements, error: annError } = await supabase
+          .from('announcements')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('is_active', true)
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(5);
 
-        if (error) throw error;
-        setNotifications(data.length > 0 ? data : mockNotifications);
+        if (!annError && announcements) {
+          const announcementNotifs: Notification[] = announcements
+            .filter(a => !role || a.target_roles?.includes(role) || a.target_roles?.includes('student'))
+            .map(a => ({
+              id: `ann-${a.id}`,
+              title: a.title,
+              message: a.message,
+              type: 'announcement',
+              read: false,
+              created_at: a.created_at,
+              isAnnouncement: true,
+              priority: a.priority,
+            }));
+          allNotifications = [...announcementNotifs];
+        }
+
+        // Fetch user notifications if logged in
+        if (user) {
+          const { data: userNotifs, error: notifError } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+          if (!notifError && userNotifs) {
+            allNotifications = [...allNotifications, ...userNotifs];
+          }
+        }
+
+        // Sort by date and add mock notifications if none exist
+        allNotifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        
+        if (allNotifications.length === 0) {
+          allNotifications = mockNotifications;
+        }
+
+        setNotifications(allNotifications);
       } catch (error) {
         console.error('Error fetching notifications:', error);
         setNotifications(mockNotifications);
@@ -87,14 +124,14 @@ const NotificationsPanel: React.FC = () => {
     };
 
     fetchNotifications();
-  }, [user]);
+  }, [user, role]);
 
   const markAsRead = async (id: string) => {
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
 
-    if (user) {
+    if (user && !id.startsWith('ann-') && !id.startsWith('mock-')) {
       await supabase
         .from('notifications')
         .update({ read: true })
@@ -107,7 +144,12 @@ const NotificationsPanel: React.FC = () => {
     toast.success('Notification dismissed');
   };
 
-  const getIcon = (type: string) => {
+  const getIcon = (type: string, priority?: string) => {
+    if (type === 'announcement') {
+      if (priority === 'urgent') return <AlertTriangle className="w-5 h-5 text-destructive" />;
+      if (priority === 'high') return <Megaphone className="w-5 h-5 text-warning" />;
+      return <Info className="w-5 h-5 text-primary" />;
+    }
     switch (type) {
       case 'assignment':
         return <BookOpen className="w-5 h-5 text-primary" />;
@@ -128,6 +170,14 @@ const NotificationsPanel: React.FC = () => {
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
     return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
+  const getPriorityStyle = (priority?: string) => {
+    switch (priority) {
+      case 'urgent': return 'border-l-4 border-l-destructive bg-destructive/5';
+      case 'high': return 'border-l-4 border-l-warning bg-warning/5';
+      default: return '';
+    }
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -168,9 +218,13 @@ const NotificationsPanel: React.FC = () => {
         )}
       </div>
 
-      <Card className="divide-y divide-border">
+      <Card className="divide-y divide-border overflow-hidden">
         <AnimatePresence mode="popLayout">
-          {notifications.length === 0 ? (
+          {loading ? (
+            <div className="p-8 flex items-center justify-center">
+              <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full" />
+            </div>
+          ) : notifications.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -187,23 +241,36 @@ const NotificationsPanel: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20, height: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className={`p-4 flex items-start gap-3 group relative ${
+                className={`p-4 flex items-start gap-3 group relative cursor-pointer hover:bg-secondary/30 transition-colors ${
                   !notification.read ? 'bg-primary/5' : ''
-                }`}
+                } ${notification.isAnnouncement ? getPriorityStyle(notification.priority) : ''}`}
                 onClick={() => markAsRead(notification.id)}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  !notification.read ? 'bg-primary/10' : 'bg-secondary'
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  notification.isAnnouncement 
+                    ? notification.priority === 'urgent' 
+                      ? 'bg-destructive/10' 
+                      : notification.priority === 'high' 
+                        ? 'bg-warning/10' 
+                        : 'bg-primary/10'
+                    : !notification.read ? 'bg-primary/10' : 'bg-secondary'
                 }`}>
-                  {getIcon(notification.type)}
+                  {getIcon(notification.type, notification.priority)}
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h4 className={`font-medium ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        {notification.title}
-                      </h4>
+                      <div className="flex items-center gap-2">
+                        <h4 className={`font-medium ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {notification.title}
+                        </h4>
+                        {notification.isAnnouncement && (
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary">
+                            Announcement
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {notification.message}
                       </p>
@@ -213,7 +280,7 @@ const NotificationsPanel: React.FC = () => {
                         e.stopPropagation();
                         dismissNotification(notification.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-secondary rounded"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-secondary rounded flex-shrink-0"
                     >
                       <X className="w-4 h-4 text-muted-foreground" />
                     </button>
