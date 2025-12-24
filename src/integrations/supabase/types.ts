@@ -14,6 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_courses: {
+        Row: {
+          category: string
+          class: string
+          course_id: number
+          created_at: string
+          created_by: string
+          description: string | null
+          duration: string | null
+          id: string
+          instructor: string
+          is_free: boolean
+          is_published: boolean
+          price: string
+          subject: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          category: string
+          class: string
+          course_id: number
+          created_at?: string
+          created_by: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          instructor: string
+          is_free?: boolean
+          is_published?: boolean
+          price?: string
+          subject: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string
+          class?: string
+          course_id?: number
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          instructor?: string
+          is_free?: boolean
+          is_published?: boolean
+          price?: string
+          subject?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      announcements: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          message: string
+          priority: string
+          target_roles: string[] | null
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          message: string
+          priority?: string
+          target_roles?: string[] | null
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          priority?: string
+          target_roles?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           counsellor_name: string | null
@@ -92,6 +194,39 @@ export type Database = {
           id?: string
           progress?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      course_materials: {
+        Row: {
+          course_id: number
+          created_at: string
+          created_by: string
+          file_size: string | null
+          file_url: string
+          id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          course_id: number
+          created_at?: string
+          created_by: string
+          file_size?: string | null
+          file_url: string
+          id?: string
+          title: string
+          type: string
+        }
+        Update: {
+          course_id?: number
+          created_at?: string
+          created_by?: string
+          file_size?: string | null
+          file_url?: string
+          id?: string
+          title?: string
+          type?: string
         }
         Relationships: []
       }
