@@ -20,7 +20,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from './AnimatedBackground';
 import GradientMesh from './GradientMesh';
-import HeroEducationalElements from './HeroEducationalElements';
+import LogoHero from './LogoHero';
 import { 
   AnimatedStat,
   TiltCard
@@ -54,82 +54,43 @@ const TypedText: React.FC<{ text: string; delay?: number; className?: string }> 
 };
 
 // Enhanced gradient text with refined shimmer effect
-const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> = ({ 
-  children, 
-  className = '' 
+const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> = ({
+  children,
+  className = ''
 }) => {
   return (
     <motion.span
       className={`relative inline-block ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Main gradient text */}
-      <span className="relative z-10 bg-gradient-to-r from-primary via-accent to-energy bg-clip-text text-transparent">
+      {/* For light mode: solid readable color. For dark mode: keep gradient bg-clip text. */}
+      <span className="relative z-30 text-slate-900 dark:bg-gradient-to-r dark:from-primary dark:via-accent dark:to-energy dark:bg-clip-text dark:text-transparent">
         {children}
       </span>
-      
-      {/* Subtle shimmer overlay - reduced intensity and slower */}
+
+      {/* Very subtle shimmer overlay sitting behind text */}
       <motion.span
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0"
-        animate={{ 
-          x: ['-200%', '200%'],
-          opacity: [0, 0.4, 0]
+        className="absolute inset-0 pointer-events-none z-0"
+        animate={{
+          x: ['-180%', '180%'],
+          opacity: [0, 0.08, 0]
         }}
-        transition={{ 
-          duration: 4, 
-          repeat: Infinity, 
-          ease: 'easeInOut',
-          repeatDelay: 1 
-        }}
-        style={{
-          backgroundSize: '50% 100%',
-          filter: 'blur(6px)'
-        }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)', filter: 'blur(6px)', mixBlendMode: 'screen' }}
       />
-      
-      {/* Secondary glow effect - reduced */}
+
+      {/* Secondary soft glow behind text to add depth (very low opacity) */}
       <motion.span
-        className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0"
-        animate={{ 
-          x: ['-200%', '200%'],
-        }}
-        transition={{ 
-          duration: 4, 
-          repeat: Infinity, 
-          ease: 'easeInOut',
-          repeatDelay: 1,
-          delay: 0.1
-        }}
-        style={{
-          filter: 'blur(8px)'
-        }}
+        className="absolute inset-0 pointer-events-none z-0"
+        animate={{ x: ['-200%', '200%'] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1, delay: 0.1 }}
+        style={{ background: 'linear-gradient(90deg, rgba(124,58,237,0.06), rgba(6,182,212,0.06))', filter: 'blur(10px)', mixBlendMode: 'screen' }}
       />
     </motion.span>
   );
 };
-
-// Removed old ParallaxVisualSystem - now using HeroEducationalElements on the right side
-
-
-const EnhancedHeroSection: React.FC = () => {
-  const { language } = useLanguage();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start'],
-  });
-
-  // Enhanced parallax with multiple layers
-  const y = useSpring(
-    useTransform(scrollYProgress, [0, 1], ['0%', '50%']),
-    { stiffness: 80, damping: 25, mass: 0.3 }
-  );
-  const opacity = useSpring(
-    useTransform(scrollYProgress, [0, 0.6], [1, 0]),
-    { stiffness: 100, damping: 30 }
-  );
   const scale = useSpring(
     useTransform(scrollYProgress, [0, 1], [1, 1.1]),
     { stiffness: 100, damping: 30 }
@@ -197,8 +158,7 @@ const EnhancedHeroSection: React.FC = () => {
         <GradientMesh />
       </div>
 
-      {/* Hero Educational Elements - Logo with Icons on Right Side */}
-      <HeroEducationalElements />
+      {/* Right-side animated logo hero will render inside the right grid column */}
 
       {/* Background Parallax Layer */}
       <motion.div
@@ -211,12 +171,12 @@ const EnhancedHeroSection: React.FC = () => {
       {/* Main Content */}
       <motion.div
         style={{ y, opacity }}
-        className="relative z-30 container mx-auto px-6 py-12 lg:py-16"
+        className="relative z-40 container mx-auto px-6 py-12 lg:py-16"
       >
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             {/* Left Content */}
-            <div className="space-y-6 text-center lg:text-left">
+            <div className="space-y-6 text-center lg:text-left relative z-50">
               {/* Badge */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -356,9 +316,13 @@ const EnhancedHeroSection: React.FC = () => {
               </motion.div>
             </div>
 
-            {/* Right Side - Large Logo with Educational Elements in Circle */}
-            <div className="relative h-[600px] hidden lg:block">
-              {/* This space is intentionally left for the absolute positioned HeroEducationalElements */}
+            {/* Right Side - Large Logo with animated rings */}
+            <div className="relative h-[600px] hidden lg:flex items-center justify-center">
+              <div className="w-full h-full flex items-center justify-end pr-12">
+                <div className="w-full max-w-[520px] h-full flex items-center justify-center relative z-10">
+                  <LogoHero />
+                </div>
+              </div>
             </div>
           </div>
         </div>
