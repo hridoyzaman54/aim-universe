@@ -6,8 +6,10 @@ import CustomCursor from '@/components/ui/CustomCursor';
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('@/pages/Index'));
-const Courses = lazy(() => import('@/pages/Courses'));
+const Courses = lazy(() => import('@/pages/CoursesNew'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const StudentDashboard = lazy(() => import('@/pages/StudentDashboard'));
+const ParentDashboard = lazy(() => import('@/pages/ParentDashboard'));
 const TinyExplorers = lazy(() => import('@/pages/TinyExplorers'));
 const SpecialNeeds = lazy(() => import('@/pages/SpecialNeeds'));
 const Counselling = lazy(() => import('@/pages/Counselling'));
@@ -290,6 +292,22 @@ const AnimatedRoutes: React.FC = () => {
               element={
                 <AnimatedPage variant="slideUp">
                   <Profile />
+                </AnimatedPage>
+              }
+            />
+            <Route
+              path="/student-dashboard"
+              element={
+                <AnimatedPage variant="slideUp">
+                  <StudentDashboard />
+                </AnimatedPage>
+              }
+            />
+            <Route
+              path="/parent-dashboard"
+              element={
+                <AnimatedPage variant="slideUp">
+                  <ParentDashboard />
                 </AnimatedPage>
               }
             />

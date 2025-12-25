@@ -32,7 +32,7 @@ serve(async (req) => {
         messages: [
           { 
             role: "system", 
-            content: `You are AIMbot, a friendly and helpful AI learning assistant for Shikkhok (শিক্ষক), an educational platform focused on inclusive education in Bangladesh.
+            content: `You are AIMbot, a friendly and helpful AI learning assistant for AIM Centre 360, an educational platform focused on inclusive education in Bangladesh.
 
 Your role is to:
 - Help students with their learning questions across all subjects

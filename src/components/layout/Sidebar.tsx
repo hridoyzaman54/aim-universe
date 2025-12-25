@@ -60,17 +60,17 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
     { path: '/counselling', icon: Heart, label: 'Counselling' },
     { path: '/quest-lab', icon: Gamepad2, label: t('nav.questLab') },
     { path: '/aimverse', icon: Tv, label: t('nav.aimverse') },
-    // Dynamic auth/profile link
-    ...(user 
-      ? [{ path: '/profile', icon: User, label: 'Profile' }]
-      : [{ path: '/auth', icon: LogIn, label: 'Login' }]
-    ),
     // Admin link for admins
     ...(role === 'admin' 
       ? [{ path: '/admin', icon: Shield, label: 'Admin' }]
       : []
     ),
   ];
+
+  // Separate auth/profile item - always visible at bottom
+  const authItem = user 
+    ? { path: '/profile', icon: User, label: 'Profile' }
+    : { path: '/auth', icon: LogIn, label: 'Login / Sign Up' };
 
   return (
     <motion.aside
@@ -80,8 +80,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
       className="fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border z-[100] flex flex-col"
     >
       {/* Logo */}
-      <div className="p-4 flex items-center gap-3 border-b border-sidebar-border h-[72px]">
-        <Logo collapsed={collapsed} showText={!collapsed} size="md" />
+      <div className="px-3 py-2 flex items-center gap-2 border-b border-sidebar-border min-h-[80px]">
+        <Logo collapsed={collapsed} showText={!collapsed} size="sm" />
       </div>
 
       {/* Navigation */}
@@ -210,6 +210,34 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
 
       {/* Bottom Controls */}
       <div className="p-4 border-t border-sidebar-border space-y-3">
+        {/* Auth/Profile Button - Always visible - PROMINENT */}
+        <Link to={authItem.path}>
+          <motion.div
+            whileHover={{ scale: 1.03, boxShadow: '0 8px 16px rgba(0,0,0,0.15)' }}
+            whileTap={{ scale: 0.97 }}
+            className={cn(
+              'w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl transition-all shadow-md',
+              location.pathname === authItem.path
+                ? 'bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground font-bold'
+                : 'bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold hover:shadow-lg'
+            )}
+          >
+            <authItem.icon className="w-5 h-5 flex-shrink-0" />
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-sm font-bold whitespace-nowrap tracking-wide"
+                >
+                  {authItem.label}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </Link>
+
         {/* Theme Toggle */}
         <motion.button
           whileHover={{ scale: 1.02 }}

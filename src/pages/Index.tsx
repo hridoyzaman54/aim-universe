@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '@/components/layout/Layout';
-import HeroSection from '@/components/home/HeroSection';
-import FeaturesSection from '@/components/home/FeaturesSection';
+import EnhancedHeroSection from '@/components/home/EnhancedHeroSection';
+import EnhancedFeaturesSection from '@/components/home/EnhancedFeaturesSection';
 import CourseCategoriesSection from '@/components/home/CourseCategoriesSection';
 import TinyExplorersPreview from '@/components/home/TinyExplorersPreview';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
@@ -11,8 +11,8 @@ import Footer from '@/components/layout/Footer';
 const Index: React.FC = () => {
   return (
     <Layout>
-      <HeroSection />
-      <FeaturesSection />
+      <EnhancedHeroSection />
+      <EnhancedFeaturesSection />
       <CourseCategoriesSection />
       <TinyExplorersPreview />
       <TestimonialsSection />

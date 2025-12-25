@@ -20,7 +20,7 @@ import {
   Search, RefreshCw, MoreHorizontal, Bell, Megaphone,
   UserCheck, Plus, Edit, Trash2, FileText, Video,
   Link as LinkIcon, Upload, Eye, EyeOff, Save, X,
-  AlertCircle, CheckCircle2, Clock, Settings
+  AlertCircle, CheckCircle2, Clock, Settings, History
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import VersionManager from '@/components/admin/VersionManager';
 
 interface UserData {
   id: string;
@@ -448,7 +449,7 @@ const AdminDashboard: React.FC = () => {
 
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
@@ -464,6 +465,10 @@ const AdminDashboard: React.FC = () => {
             <TabsTrigger value="courses" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">Courses</span>
+            </TabsTrigger>
+            <TabsTrigger value="versions" className="flex items-center gap-2">
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">Versions</span>
             </TabsTrigger>
           </TabsList>
 
@@ -734,6 +739,13 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 )}
               </div>
+            </motion.div>
+          </TabsContent>
+
+          {/* Version Control Tab */}
+          <TabsContent value="versions">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <VersionManager />
             </motion.div>
           </TabsContent>
         </Tabs>

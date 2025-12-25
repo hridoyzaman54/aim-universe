@@ -7,6 +7,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AnimatedRoutes from "./components/layout/AnimatedRoutes";
+import CustomCursor from "@/components/ui/CustomCursor";
+import ScrollProgressBar from "@/components/ui/ScrollProgressBar";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +18,8 @@ const App = () => (
       <LanguageProvider>
         <AuthProvider>
           <TooltipProvider>
+            <CustomCursor />
+            <ScrollProgressBar />
             <Toaster />
             <Sonner />
             <BrowserRouter>

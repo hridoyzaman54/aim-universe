@@ -106,7 +106,7 @@ const Auth: React.FC = () => {
         } else {
           toast({
             title: 'Account Created!',
-            description: 'Welcome to Shikkhok! You can now start learning.',
+            description: 'Welcome to AIM Centre 360! You can now start learning.',
           });
           navigate('/dashboard');
         }
@@ -145,7 +145,7 @@ const Auth: React.FC = () => {
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-3xl font-display font-bold text-foreground">শিক্ষক</span>
+              <span className="text-3xl font-display font-bold bg-gradient-to-r from-primary via-accent to-energy bg-clip-text text-transparent">AIM Centre 360</span>
             </div>
             <h1 className="text-4xl xl:text-5xl font-display font-bold text-foreground mb-6 leading-tight">
               Unlock Your<br />

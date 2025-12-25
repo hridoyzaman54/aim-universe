@@ -1,0 +1,397 @@
+import React, { useRef, useState, useEffect } from 'react';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence, MotionValue } from 'framer-motion';
+import { 
+  ArrowRight, 
+  Play, 
+  Sparkles,
+  Brain,
+  BookOpen,
+  GraduationCap,
+  Target,
+  Trophy,
+  Rocket,
+  Zap,
+  Users,
+  Award,
+  Star
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/button';
+import AnimatedBackground from './AnimatedBackground';
+import GradientMesh from './GradientMesh';
+import HeroEducationalElements from './HeroEducationalElements';
+import { 
+  AnimatedStat,
+  TiltCard
+} from './HeroInteractiveElements';
+
+// Animated text with character-by-character reveal
+const TypedText: React.FC<{ text: string; delay?: number; className?: string }> = ({ 
+  text, 
+  delay = 0,
+  className = ''
+}) => {
+  return (
+    <span className={`inline-flex flex-wrap ${className}`}>
+      {text.split('').map((char, index) => (
+        <motion.span
+          key={index}
+          initial={{ opacity: 0, y: 20, rotateX: 90 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{
+            duration: 0.5,
+            delay: delay + index * 0.04,
+            ease: [0.16, 1, 0.3, 1]
+          }}
+          className={char === ' ' ? 'mr-2' : ''}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </span>
+  );
+};
+
+// Enhanced gradient text with refined shimmer effect
+const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> = ({ 
+  children, 
+  className = '' 
+}) => {
+  return (
+    <motion.span
+      className={`relative inline-block ${className}`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {/* Main gradient text */}
+      <span className="relative z-10 bg-gradient-to-r from-primary via-accent to-energy bg-clip-text text-transparent">
+        {children}
+      </span>
+      
+      {/* Subtle shimmer overlay - reduced intensity and slower */}
+      <motion.span
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0"
+        animate={{ 
+          x: ['-200%', '200%'],
+          opacity: [0, 0.4, 0]
+        }}
+        transition={{ 
+          duration: 4, 
+          repeat: Infinity, 
+          ease: 'easeInOut',
+          repeatDelay: 1 
+        }}
+        style={{
+          backgroundSize: '50% 100%',
+          filter: 'blur(6px)'
+        }}
+      />
+      
+      {/* Secondary glow effect - reduced */}
+      <motion.span
+        className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0"
+        animate={{ 
+          x: ['-200%', '200%'],
+        }}
+        transition={{ 
+          duration: 4, 
+          repeat: Infinity, 
+          ease: 'easeInOut',
+          repeatDelay: 1,
+          delay: 0.1
+        }}
+        style={{
+          filter: 'blur(8px)'
+        }}
+      />
+    </motion.span>
+  );
+};
+
+// Removed old ParallaxVisualSystem - now using HeroEducationalElements on the right side
+
+
+const EnhancedHeroSection: React.FC = () => {
+  const { language } = useLanguage();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  });
+
+  // Enhanced parallax with multiple layers
+  const y = useSpring(
+    useTransform(scrollYProgress, [0, 1], ['0%', '50%']),
+    { stiffness: 80, damping: 25, mass: 0.3 }
+  );
+  const opacity = useSpring(
+    useTransform(scrollYProgress, [0, 0.6], [1, 0]),
+    { stiffness: 100, damping: 30 }
+  );
+  const scale = useSpring(
+    useTransform(scrollYProgress, [0, 1], [1, 1.1]),
+    { stiffness: 100, damping: 30 }
+  );
+  const blur = useTransform(scrollYProgress, [0, 1], [0, 10]);
+
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [cursorVariant, setCursorVariant] = useState('default');
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const content = {
+    en: {
+      badge: 'Transform Your Learning Journey',
+      titleHighlight: 'AIM Centre 360',
+      subtitle: 'Aim High, Achieve Infinity',
+      description: 'Experience next-generation education with AI-powered learning, expert counseling, and comprehensive support for students of all abilities.',
+      cta: 'Start Learning',
+      explore: 'Explore Courses',
+      stats: {
+        students: { value: '10000', label: 'Active Students' },
+        courses: { value: '500', label: 'Expert Courses' },
+        success: { value: '98', label: 'Success Rate' },
+        satisfaction: { value: '95', label: 'Satisfaction' },
+      }
+    },
+    bn: {
+      badge: 'আপনার শেখার যাত্রা রূপান্তরিত করুন',
+      titleHighlight: 'AIM Centre 360',
+      subtitle: 'উচ্চ লক্ষ্য, অসীম সাফল্য',
+      description: 'এআই-চালিত শিক্ষা, বিশেষজ্ঞ পরামর্শ এবং সকল ক্ষমতার শিক্ষার্থীদের জন্য ব্যাপক সহায়তা সহ পরবর্তী প্রজন্মের শিক্ষা অনুভব করুন।',
+      cta: 'শেখা শুরু করুন',
+      explore: 'কোর্স অন্বেষণ করুন',
+      stats: {
+        students: { value: '10000', label: 'সক্রিয় শিক্ষার্থী' },
+        courses: { value: '500', label: 'বিশেষজ্ঞ কোর্স' },
+        success: { value: '98', label: 'সাফল্যের হার' },
+        satisfaction: { value: '95', label: 'সন্তুষ্টি' },
+      }
+    },
+  };
+
+  const t = content[language];
+
+  return (
+    <section
+      ref={containerRef}
+      className="relative h-screen flex items-center justify-center overflow-hidden bg-background"
+      style={{
+        maskImage: 'linear-gradient(to bottom, black 0%, black 85%, transparent 100%)',
+        WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 85%, transparent 100%)'
+      }}
+    >
+      {/* Interactive Mouse Background */}
+      {/* Animated Background Layers */}
+      <div className="absolute inset-0 z-0">
+        <AnimatedBackground />
+        <GradientMesh />
+      </div>
+
+      {/* Hero Educational Elements - Logo with Icons on Right Side */}
+      <HeroEducationalElements />
+
+      {/* Background Parallax Layer */}
+      <motion.div
+        style={{ scale, filter: `blur(${blur}px)` }}
+        className="absolute inset-0 z-0"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5" />
+      </motion.div>
+
+      {/* Main Content */}
+      <motion.div
+        style={{ y, opacity }}
+        className="relative z-30 container mx-auto px-6 py-12 lg:py-16"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            {/* Left Content */}
+            <div className="space-y-6 text-center lg:text-left">
+              {/* Badge */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="inline-flex"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 backdrop-blur-sm">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                  >
+                    <Sparkles className="w-4 h-4 text-primary" />
+                  </motion.div>
+                  <span className="text-sm font-medium text-primary">{t.badge}</span>
+                </div>
+              </motion.div>
+
+              {/* Main Title */}
+              <div className="space-y-3">
+                <motion.h1 
+                  className="text-4xl lg:text-6xl font-display font-bold leading-tight"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <ShimmerText className="text-5xl lg:text-7xl">
+                    {t.titleHighlight}
+                  </ShimmerText>
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="text-lg lg:text-xl font-semibold bg-gradient-to-r from-accent via-primary to-energy bg-clip-text text-transparent"
+                >
+                  {t.subtitle}
+                </motion.p>
+              </div>
+
+              {/* Description */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="text-base text-muted-foreground max-w-2xl leading-relaxed"
+              >
+                {t.description}
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              >
+                <Link to="/auth">
+                  <Button
+                    size="lg"
+                    className="group relative overflow-hidden bg-primary dark:bg-primary hover:bg-primary/90 text-white font-semibold text-base px-6 py-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    onMouseEnter={() => setCursorVariant('button')}
+                    onMouseLeave={() => setCursorVariant('default')}
+                  >
+                    <span className="relative flex items-center gap-2">
+                      {t.cta}
+                      <motion.div
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity }}
+                      >
+                        <ArrowRight className="w-5 h-5" />
+                      </motion.div>
+                    </span>
+                  </Button>
+                </Link>
+
+                <Link to="/courses">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="group relative font-semibold text-base px-6 py-5 rounded-2xl border-2 border-primary/30 hover:border-primary hover:bg-primary/10 transition-all duration-300"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Play className="w-5 h-5" />
+                      {t.explore}
+                    </span>
+                  </Button>
+                </Link>
+              </motion.div>
+
+              {/* Quick Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6"
+              >
+                {Object.entries(t.stats).map(([key, stat], index) => (
+                  <motion.div
+                    key={key}
+                    initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ 
+                      delay: 1.1 + index * 0.15,
+                      duration: 0.6,
+                      type: 'spring',
+                      stiffness: 200,
+                      damping: 15
+                    }}
+                    whileHover={{ 
+                      scale: 1.05, 
+                      y: -4,
+                      transition: { duration: 0.2 }
+                    }}
+                    className="text-center lg:text-left relative group"
+                  >
+                    {/* Glow effect on hover */}
+                    <div className="absolute inset-0 rounded-xl bg-primary/10 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
+                    
+                    {/* Content - Optimized without heavy animations */}
+                    <div className="relative z-10">
+                      <div className="text-2xl font-bold text-primary">
+                        <AnimatedStat end={parseInt(stat.value)} suffix={key === 'students' || key === 'courses' ? '+' : '%'} />
+                      </div>
+                      <motion.div 
+                        className="text-xs text-muted-foreground font-medium"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.3 + index * 0.15 }}
+                      >
+                        {stat.label}
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Right Side - Large Logo with Educational Elements in Circle */}
+            <div className="relative h-[600px] hidden lg:block">
+              {/* This space is intentionally left for the absolute positioned HeroEducationalElements */}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30"
+      >
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="flex flex-col items-center gap-2 text-muted-foreground"
+        >
+          <span className="text-xs font-medium">Scroll to explore</span>
+          <motion.div
+            animate={{ scaleY: [1, 1.2, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full p-1"
+          >
+            <motion.div
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-1.5 h-1.5 bg-primary rounded-full mx-auto"
+            />
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </section>
+  );
+};
+
+export default EnhancedHeroSection;

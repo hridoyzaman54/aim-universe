@@ -12,13 +12,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem('aim-theme');
+    const saved = localStorage.getItem('aim-centre-360-theme');
     return (saved as Theme) || 'dark';
   });
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem('aim-theme', newTheme);
+    localStorage.setItem('aim-centre-360-theme', newTheme);
   };
 
   const toggleTheme = () => {
