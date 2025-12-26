@@ -60,8 +60,17 @@ export const FloatingOrb: React.FC<{ color: string; size: number; delay: number 
 };
 
 // Particle system with interactive elements
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  duration: number;
+  delay: number;
+}
+
 export const ParticleField: React.FC = () => {
-  const [particles] = useState(() =>
+  const [particles] = useState<Particle[]>(() =>
     Array.from({ length: 30 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,

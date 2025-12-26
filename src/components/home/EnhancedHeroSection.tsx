@@ -91,6 +91,15 @@ const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> =
     </motion.span>
   );
 };
+
+const EnhancedHeroSection: React.FC = () => {
+  const { language } = useLanguage();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  });
+
   const scale = useSpring(
     useTransform(scrollYProgress, [0, 1], [1, 1.1]),
     { stiffness: 100, damping: 30 }

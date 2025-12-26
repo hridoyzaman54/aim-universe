@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 interface Balloon {
   id: number;
   x: number;
+  y?: number;
   color: string;
   size: number;
   speed: number;
@@ -110,8 +111,8 @@ const BalloonGame: React.FC = () => {
       setBalloons(prev => 
         prev.map(balloon => ({
           ...balloon,
-          y: (balloon as any).y !== undefined ? (balloon as any).y - balloon.speed : 100 - balloon.speed,
-        })).filter(balloon => (balloon as any).y > -20)
+          y: balloon.y !== undefined ? balloon.y - balloon.speed : 100 - balloon.speed,
+        })).filter(balloon => balloon.y !== undefined && balloon.y > -20)
       );
     }, 50);
 
@@ -209,7 +210,7 @@ const BalloonGame: React.FC = () => {
               key={balloon.id}
               initial={{ y: '100%', scale: 0 }}
               animate={{ 
-                y: `${100 - ((balloon as any).y || 0)}%`,
+                y: `${100 - (balloon.y || 0)}%`,
                 scale: 1,
               }}
               exit={{ scale: 1.5, opacity: 0 }}
