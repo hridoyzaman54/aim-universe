@@ -1,56 +1,24 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence, MotionValue } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Play, 
-  Sparkles,
-  Brain,
-  BookOpen,
-  GraduationCap,
-  Target,
-  Trophy,
-  Rocket,
-  Zap,
-  Users,
-  Award,
-  Star
-} from 'lucide-react';
+import React, { useRef, useState, useMemo, memo } from 'react';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Play, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import AnimatedBackground from './AnimatedBackground';
 import GradientMesh from './GradientMesh';
 import LogoHero from './LogoHero';
-import { 
-  AnimatedStat,
-  TiltCard
-} from './HeroInteractiveElements';
+import { AnimatedStat } from './HeroInteractiveElements';
 
-// Animated text with character-by-character reveal
-const TypedText: React.FC<{ text: string; delay?: number; className?: string }> = ({ 
-  text, 
-  delay = 0,
-  className = ''
-}) => {
-  return (
-    <span className={`inline-flex flex-wrap ${className}`}>
-      {text.split('').map((char, index) => (
-        <motion.span
-          key={index}
-          initial={{ opacity: 0, y: 20, rotateX: 90 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{
-            duration: 0.5,
-            delay: delay + index * 0.04,
-            ease: [0.16, 1, 0.3, 1]
-          }}
-          className={char === ' ' ? 'mr-2' : ''}
-        >
-          {char}
-        </motion.span>
-      ))}
-    </span>
-  );
+// Pre-computed sparkle positions for better performance
+const SPARKLE_POSITIONS = [
+  { x: 15, y: -20 }, { x: 85, y: 30 }, { x: 45, y: -40 },
+  { x: 70, y: 10 }, { x: 25, y: 45 }, { x: 90, y: -15 }
+];
+
+// Shared animation variants for reuse
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
 };
 
 // Enhanced gradient text with refined shimmer effect
@@ -75,23 +43,18 @@ const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> =
         {text.split('').map((char, index) => (
           <motion.span
             key={index}
-            className="inline-block text-slate-900 dark:bg-gradient-to-r dark:from-primary dark:via-accent dark:to-energy dark:bg-clip-text dark:text-transparent"
+            className="inline-block text-slate-900 dark:bg-gradient-to-r dark:from-primary dark:via-accent dark:to-energy dark:bg-clip-text dark:text-transparent will-change-transform"
             animate={isHovered ? {
               y: [0, -8, 0],
               rotateX: [0, 15, 0],
               scale: [1, 1.1, 1],
-              color: ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--energy))', 'hsl(var(--primary))'],
-            } : {}}
+            } : { y: 0, rotateX: 0, scale: 1 }}
             transition={{
-              duration: 0.6,
-              delay: index * 0.03,
-              ease: [0.25, 0.46, 0.45, 0.94],
-              color: { duration: 1.2, delay: index * 0.03 }
+              duration: 0.5,
+              delay: index * 0.025,
+              ease: 'easeOut',
             }}
-            style={{ 
-              transformStyle: 'preserve-3d',
-              perspective: '1000px',
-            }}
+            style={{ transformStyle: 'preserve-3d' }}
           >
             {char === ' ' ? '\u00A0' : char}
           </motion.span>
@@ -120,36 +83,23 @@ const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> =
         }}
       />
 
-      {/* Sparkle particles on hover */}
+      {/* Sparkle particles on hover - using pre-computed positions */}
       <AnimatePresence>
-        {isHovered && (
-          <>
-            {[...Array(6)].map((_, i) => (
-              <motion.span
-                key={i}
-                className="absolute w-1.5 h-1.5 rounded-full bg-primary"
-                initial={{ 
-                  opacity: 0, 
-                  scale: 0,
-                  x: '50%',
-                  y: '50%',
-                }}
-                animate={{ 
-                  opacity: [0, 1, 0],
-                  scale: [0, 1.5, 0],
-                  x: `${Math.random() * 100}%`,
-                  y: `${Math.random() * 100 - 50}%`,
-                }}
-                exit={{ opacity: 0, scale: 0 }}
-                transition={{ 
-                  duration: 0.8,
-                  delay: i * 0.1,
-                  ease: 'easeOut',
-                }}
-              />
-            ))}
-          </>
-        )}
+        {isHovered && SPARKLE_POSITIONS.map((pos, i) => (
+          <motion.span
+            key={i}
+            className="absolute w-1.5 h-1.5 rounded-full bg-primary will-change-transform"
+            initial={{ opacity: 0, scale: 0, x: '50%', y: '50%' }}
+            animate={{ 
+              opacity: [0, 1, 0],
+              scale: [0, 1.5, 0],
+              x: `${pos.x}%`,
+              y: `${pos.y}%`,
+            }}
+            exit={{ opacity: 0, scale: 0 }}
+            transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' }}
+          />
+        ))}
       </AnimatePresence>
 
       {/* Continuous shimmer overlay */}
@@ -182,19 +132,8 @@ const EnhancedHeroSection: React.FC = () => {
   const y = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorVariant, setCursorVariant] = useState('default');
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  const content = {
+  // Memoized content to prevent recreation on every render
+  const content = useMemo(() => ({
     en: {
       badge: 'Transform Your Learning Journey',
       titleHighlight: 'AIM Centre 360',
@@ -223,7 +162,7 @@ const EnhancedHeroSection: React.FC = () => {
         satisfaction: { value: '95', label: 'সন্তুষ্টি' },
       }
     },
-  };
+  }), []);
 
   const t = content[language];
 
@@ -338,8 +277,6 @@ const EnhancedHeroSection: React.FC = () => {
                     <Button
                       size="lg"
                       className="group relative overflow-hidden bg-primary dark:bg-primary hover:bg-primary/90 text-white font-semibold text-base px-6 py-5 rounded-2xl shadow-lg hover:shadow-primary/40 hover:shadow-2xl transition-all duration-300"
-                      onMouseEnter={() => setCursorVariant('button')}
-                      onMouseLeave={() => setCursorVariant('default')}
                     >
                       {/* Animated background gradient */}
                       <motion.div
