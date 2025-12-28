@@ -105,6 +105,8 @@ const EnhancedHeroSection: React.FC = () => {
     { stiffness: 100, damping: 30 }
   );
   const blur = useTransform(scrollYProgress, [0, 1], [0, 10]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, 100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [cursorVariant, setCursorVariant] = useState('default');

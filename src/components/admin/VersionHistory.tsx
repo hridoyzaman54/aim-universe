@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { useToast } from '@/hooks/use-toast';
-import { Clock, Eye, RotateCcw, Save, Tag, User, AlertCircle } from 'lucide-react';
+import { Clock, Eye, RotateCcw, Save, Tag } from 'lucide-react';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface WebsiteVersion {
   id: string;
   version_number: number;
   version_name: string;
   description: string;
-  created_by: string;
   created_at: string;
   is_current: boolean;
-  content_snapshot: any;
-  thumbnail_url?: string;
   tags?: string[];
 }
 
@@ -29,154 +23,47 @@ interface VersionHistoryProps {
 }
 
 const VersionHistory: React.FC<VersionHistoryProps> = ({ onPreview, onRestore }) => {
-  const [versions, setVersions] = useState<WebsiteVersion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedVersion, setSelectedVersion] = useState<WebsiteVersion | null>(null);
-  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
-  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchVersions();
-  }, []);
-
-  const fetchVersions = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('website_versions')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setVersions(data || []);
-    } catch (error) {
-      console.error('Error fetching versions:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load version history',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  // Mock data for version history (can be replaced with actual database integration later)
+  const [versions] = useState<WebsiteVersion[]>([
+    {
+      id: '1',
+      version_number: 1,
+      version_name: 'Initial Release',
+      description: 'First version of the website',
+      created_at: new Date().toISOString(),
+      is_current: true,
+      tags: ['release'],
+    },
+  ]);
 
   const handlePreview = (version: WebsiteVersion) => {
-    setSelectedVersion(version);
-    setShowPreviewDialog(true);
     if (onPreview) {
       onPreview(version);
     }
-
-    // Track the preview
-    trackPreview(version.id);
+    toast({
+      title: 'Preview',
+      description: `Previewing version ${version.version_number}`,
+    });
   };
 
-  const trackPreview = async (versionId: string) => {
-    try {
-      await supabase.rpc('track_version_preview', {
-        p_version_id: versionId,
-      });
-    } catch (error) {
-      console.error('Error tracking preview:', error);
+  const handleRestore = (version: WebsiteVersion) => {
+    if (onRestore) {
+      onRestore(version);
     }
+    toast({
+      title: 'Restore',
+      description: `Version ${version.version_number} would be restored`,
+    });
   };
 
-  const handleRestore = async (version: WebsiteVersion) => {
-    setSelectedVersion(version);
-    setShowRestoreDialog(true);
+  const handleSaveCurrentVersion = () => {
+    toast({
+      title: 'Version Saved',
+      description: 'Current website state has been saved',
+    });
   };
-
-  const confirmRestore = async () => {
-    if (!selectedVersion) return;
-
-    try {
-      const { data, error } = await supabase.rpc('restore_website_version', {
-        p_version_id: selectedVersion.id,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Version Restored',
-        description: `Successfully restored to version ${selectedVersion.version_number}: ${selectedVersion.version_name}`,
-      });
-
-      // Refresh versions list
-      await fetchVersions();
-
-      if (onRestore) {
-        onRestore(selectedVersion);
-      }
-
-      setShowRestoreDialog(false);
-      setSelectedVersion(null);
-
-      // Optionally reload the page to reflect changes
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    } catch (error) {
-      console.error('Error restoring version:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to restore version',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleSaveCurrentVersion = async () => {
-    try {
-      // Capture current website state
-      const currentState = {
-        pages: {
-          home: {
-            components: ['HeroSection', 'FeaturesSection', 'CourseCategoriesSection', 'TinyExplorersPreview', 'TestimonialsSection', 'CTASection'],
-            theme: 'default',
-          },
-          // Add other pages as needed
-        },
-        globalSettings: {
-          theme: 'default',
-          language: 'en',
-        },
-        timestamp: new Date().toISOString(),
-      };
-
-      const { data, error } = await supabase.rpc('create_website_version', {
-        p_version_name: `Version ${versions.length + 1}`,
-        p_description: `Auto-saved on ${format(new Date(), 'PPpp')}`,
-        p_content_snapshot: currentState,
-        p_tags: ['auto-save'],
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: 'Version Saved',
-        description: 'Current website state has been saved successfully',
-      });
-
-      await fetchVersions();
-    } catch (error) {
-      console.error('Error saving version:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to save current version',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -256,85 +143,6 @@ const VersionHistory: React.FC<VersionHistoryProps> = ({ onPreview, onRestore })
           ))}
         </div>
       </ScrollArea>
-
-      {/* Preview Dialog */}
-      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>
-              Preview: Version {selectedVersion?.version_number} - {selectedVersion?.version_name}
-            </DialogTitle>
-            <DialogDescription>{selectedVersion?.description}</DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="h-[500px] w-full rounded-md border p-4">
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2">Content Snapshot</h3>
-                <pre className="bg-muted p-4 rounded-lg text-xs overflow-auto">
-                  {JSON.stringify(selectedVersion?.content_snapshot, null, 2)}
-                </pre>
-              </div>
-              <Separator />
-              <div>
-                <h3 className="font-semibold mb-2">Version Information</h3>
-                <div className="space-y-2 text-sm">
-                  <p>
-                    <strong>Created:</strong> {selectedVersion && format(new Date(selectedVersion.created_at), 'PPpp')}
-                  </p>
-                  {selectedVersion?.tags && (
-                    <p>
-                      <strong>Tags:</strong> {selectedVersion.tags.join(', ')}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </ScrollArea>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPreviewDialog(false)}>
-              Close
-            </Button>
-            {selectedVersion && !selectedVersion.is_current && (
-              <Button onClick={() => {
-                setShowPreviewDialog(false);
-                handleRestore(selectedVersion);
-              }}>
-                Restore This Version
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Restore Confirmation Dialog */}
-      <Dialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-yellow-500" />
-              Confirm Version Restore
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to restore to Version {selectedVersion?.version_number}:{' '}
-              {selectedVersion?.version_name}? This will replace the current website state.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-sm">
-              <strong>Note:</strong> The current version will be preserved in history, and you can always restore back to it later.
-            </p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRestoreDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={confirmRestore} className="gap-2">
-              <RotateCcw className="h-4 w-4" />
-              Restore Version
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

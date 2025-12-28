@@ -1,22 +1,22 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface AutoSaveOptions {
   enabled: boolean;
   interval?: number; // in milliseconds, default 5 minutes
   onSave?: (versionId: string) => void;
-  onError?: (error: any) => void;
+  onError?: (error: Error) => void;
 }
 
 interface WebsiteState {
-  pages: Record<string, any>;
-  globalSettings: Record<string, any>;
+  pages: Record<string, unknown>;
+  globalSettings: Record<string, unknown>;
   timestamp: string;
 }
 
 /**
  * Custom hook to automatically save website versions at regular intervals
+ * Currently uses local storage - can be extended to use database later
  */
 export const useAutoSave = (options: AutoSaveOptions) => {
   const { enabled, interval = 5 * 60 * 1000, onSave, onError } = options;
@@ -25,8 +25,6 @@ export const useAutoSave = (options: AutoSaveOptions) => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const captureWebsiteState = useCallback((): WebsiteState => {
-    // Capture current website state
-    // In a real implementation, you'd capture actual component states
     return {
       pages: {
         home: {
@@ -68,14 +66,18 @@ export const useAutoSave = (options: AutoSaveOptions) => {
         return;
       }
 
-      const { data, error } = await supabase.rpc('create_website_version', {
-        p_version_name: `Auto-save ${new Date().toLocaleString()}`,
-        p_description: 'Automatically saved version',
-        p_content_snapshot: currentState,
-        p_tags: ['auto-save'],
+      // Save to localStorage for now
+      const versionId = `version_${Date.now()}`;
+      const existingVersions = JSON.parse(localStorage.getItem('website_versions') || '[]');
+      existingVersions.push({
+        id: versionId,
+        name: `Auto-save ${new Date().toLocaleString()}`,
+        description: 'Automatically saved version',
+        state: currentState,
+        tags: ['auto-save'],
+        createdAt: new Date().toISOString(),
       });
-
-      if (error) throw error;
+      localStorage.setItem('website_versions', JSON.stringify(existingVersions));
 
       lastSaveRef.current = stateString;
 
@@ -85,12 +87,12 @@ export const useAutoSave = (options: AutoSaveOptions) => {
         duration: 2000,
       });
 
-      if (onSave && data) {
-        onSave(data);
+      if (onSave) {
+        onSave(versionId);
       }
     } catch (error) {
       console.error('Auto-save error:', error);
-      if (onError) {
+      if (onError && error instanceof Error) {
         onError(error);
       }
     }
