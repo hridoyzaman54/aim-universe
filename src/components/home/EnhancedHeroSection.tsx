@@ -58,19 +58,101 @@ const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> =
   children,
   className = ''
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const text = typeof children === 'string' ? children : '';
+  
   return (
     <motion.span
       className={`relative inline-block ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* For light mode: solid readable color. For dark mode: keep gradient bg-clip text. */}
-      <span className="relative z-30 text-slate-900 dark:bg-gradient-to-r dark:from-primary dark:via-accent dark:to-energy dark:bg-clip-text dark:text-transparent">
-        {children}
+      {/* Letter-by-letter animation container */}
+      <span className="relative z-30 inline-flex">
+        {text.split('').map((char, index) => (
+          <motion.span
+            key={index}
+            className="inline-block text-slate-900 dark:bg-gradient-to-r dark:from-primary dark:via-accent dark:to-energy dark:bg-clip-text dark:text-transparent"
+            animate={isHovered ? {
+              y: [0, -8, 0],
+              rotateX: [0, 15, 0],
+              scale: [1, 1.1, 1],
+              color: ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--energy))', 'hsl(var(--primary))'],
+            } : {}}
+            transition={{
+              duration: 0.6,
+              delay: index * 0.03,
+              ease: [0.25, 0.46, 0.45, 0.94],
+              color: { duration: 1.2, delay: index * 0.03 }
+            }}
+            style={{ 
+              transformStyle: 'preserve-3d',
+              perspective: '1000px',
+            }}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </motion.span>
+        ))}
       </span>
 
-      {/* Very subtle shimmer overlay sitting behind text */}
+      {/* Animated underline on hover */}
+      <motion.span
+        className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-primary via-accent to-energy rounded-full"
+        initial={{ width: 0, opacity: 0 }}
+        animate={isHovered ? { width: '100%', opacity: 1 } : { width: 0, opacity: 0 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      />
+
+      {/* Glow effect behind text on hover */}
+      <motion.span
+        className="absolute inset-0 pointer-events-none z-0 blur-2xl"
+        initial={{ opacity: 0 }}
+        animate={isHovered ? { 
+          opacity: [0, 0.6, 0.4],
+          scale: [1, 1.2, 1.1],
+        } : { opacity: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{ 
+          background: 'linear-gradient(90deg, hsl(var(--primary) / 0.5), hsl(var(--accent) / 0.5), hsl(var(--energy) / 0.5))',
+        }}
+      />
+
+      {/* Sparkle particles on hover */}
+      <AnimatePresence>
+        {isHovered && (
+          <>
+            {[...Array(6)].map((_, i) => (
+              <motion.span
+                key={i}
+                className="absolute w-1.5 h-1.5 rounded-full bg-primary"
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0,
+                  x: '50%',
+                  y: '50%',
+                }}
+                animate={{ 
+                  opacity: [0, 1, 0],
+                  scale: [0, 1.5, 0],
+                  x: `${Math.random() * 100}%`,
+                  y: `${Math.random() * 100 - 50}%`,
+                }}
+                exit={{ opacity: 0, scale: 0 }}
+                transition={{ 
+                  duration: 0.8,
+                  delay: i * 0.1,
+                  ease: 'easeOut',
+                }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Continuous shimmer overlay */}
       <motion.span
         className="absolute inset-0 pointer-events-none z-0"
         animate={{
@@ -79,14 +161,6 @@ const ShimmerText: React.FC<{ children: React.ReactNode; className?: string }> =
         }}
         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
         style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)', filter: 'blur(6px)', mixBlendMode: 'screen' }}
-      />
-
-      {/* Secondary soft glow behind text to add depth (very low opacity) */}
-      <motion.span
-        className="absolute inset-0 pointer-events-none z-0"
-        animate={{ x: ['-200%', '200%'] }}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1, delay: 0.1 }}
-        style={{ background: 'linear-gradient(90deg, rgba(124,58,237,0.06), rgba(6,182,212,0.06))', filter: 'blur(10px)', mixBlendMode: 'screen' }}
       />
     </motion.span>
   );
