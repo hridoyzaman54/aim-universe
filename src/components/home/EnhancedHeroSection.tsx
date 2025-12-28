@@ -214,9 +214,18 @@ const EnhancedHeroSection: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  <ShimmerText className="text-5xl lg:text-7xl">
-                    {t.titleHighlight}
-                  </ShimmerText>
+                  <motion.span 
+                    className="text-5xl lg:text-7xl cursor-pointer"
+                    whileHover={{ 
+                      scale: 1.05,
+                      textShadow: "0 0 30px hsl(var(--primary) / 0.5)",
+                    }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <ShimmerText>
+                      {t.titleHighlight}
+                    </ShimmerText>
+                  </motion.span>
                 </motion.h1>
 
                 <motion.p
@@ -247,22 +256,41 @@ const EnhancedHeroSection: React.FC = () => {
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               >
                 <Link to="/auth">
-                  <Button
-                    size="lg"
-                    className="group relative overflow-hidden bg-primary dark:bg-primary hover:bg-primary/90 text-white font-semibold text-base px-6 py-5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-                    onMouseEnter={() => setCursorVariant('button')}
-                    onMouseLeave={() => setCursorVariant('default')}
+                  <motion.div
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
                   >
-                    <span className="relative flex items-center gap-2">
-                      {t.cta}
+                    <Button
+                      size="lg"
+                      className="group relative overflow-hidden bg-primary dark:bg-primary hover:bg-primary/90 text-white font-semibold text-base px-6 py-5 rounded-2xl shadow-lg hover:shadow-primary/40 hover:shadow-2xl transition-all duration-300"
+                      onMouseEnter={() => setCursorVariant('button')}
+                      onMouseLeave={() => setCursorVariant('default')}
+                    >
+                      {/* Animated background gradient */}
                       <motion.div
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                      >
-                        <ArrowRight className="w-5 h-5" />
-                      </motion.div>
-                    </span>
-                  </Button>
+                        className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100"
+                        animate={{ x: ['-100%', '100%'] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                      />
+                      {/* Shimmer effect */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+                        initial={{ x: '-100%' }}
+                        whileHover={{ x: '100%' }}
+                        transition={{ duration: 0.6 }}
+                      />
+                      <span className="relative flex items-center gap-2 z-10">
+                        {t.cta}
+                        <motion.div
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <ArrowRight className="w-5 h-5" />
+                        </motion.div>
+                      </span>
+                    </Button>
+                  </motion.div>
                 </Link>
 
                 <Link to="/courses">
