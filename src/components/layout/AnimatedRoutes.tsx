@@ -29,16 +29,16 @@ const fadeScaleVariants = {
     opacity: 1,
     scale: 1,
     transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
   exit: {
     opacity: 0,
     scale: 1.02,
     transition: {
-      duration: 0.3,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
 };
@@ -53,16 +53,16 @@ const slideRightVariants = {
     opacity: 1,
     x: 0,
     transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
   exit: {
     opacity: 0,
     x: -60,
     transition: {
-      duration: 0.3,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
 };
@@ -77,26 +77,54 @@ const slideUpVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
   exit: {
     opacity: 0,
     y: -40,
     transition: {
-      duration: 0.3,
-      ease: [0.25, 0.46, 0.45, 0.94] as const,
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1] as const,
     },
   },
 };
 
-type TransitionVariant = 'fadeScale' | 'slideRight' | 'slideUp';
+// Special Tiny Explorers transition - magical morph
+const tinyExplorersVariants = {
+  initial: {
+    opacity: 0,
+    scale: 0.92,
+    filter: 'blur(10px) saturate(0.5)',
+  },
+  enter: {
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px) saturate(1)',
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 1.08,
+    filter: 'blur(10px) saturate(0.5)',
+    transition: {
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  },
+};
+
+type TransitionVariant = 'fadeScale' | 'slideRight' | 'slideUp' | 'tinyExplorers';
 
 const variantMap = {
   fadeScale: fadeScaleVariants,
   slideRight: slideRightVariants,
   slideUp: slideUpVariants,
+  tinyExplorers: tinyExplorersVariants,
 };
 
 // Page wrapper with animation
@@ -119,35 +147,62 @@ const AnimatedPage: React.FC<{
   );
 };
 
-// Smooth transition overlay with wipe effect
-const TransitionOverlay: React.FC<{ isVisible: boolean }> = ({ isVisible }) => (
+// Smooth transition overlay with theme-aware colors
+const TransitionOverlay: React.FC<{ isVisible: boolean; isTinyExplorers: boolean }> = ({ 
+  isVisible, 
+  isTinyExplorers 
+}) => (
   <AnimatePresence>
     {isVisible && (
       <>
-        {/* Primary overlay */}
+        {/* Primary overlay - adapts to theme */}
         <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          exit={{ scaleX: 0 }}
+          initial={{ scaleY: 0, originY: 0 }}
+          animate={{ scaleY: 1 }}
+          exit={{ scaleY: 0, originY: 1 }}
           transition={{ 
-            duration: 0.4, 
-            ease: [0.25, 0.46, 0.45, 0.94],
+            duration: 0.5, 
+            ease: [0.22, 1, 0.36, 1],
           }}
-          style={{ transformOrigin: 'left' }}
-          className="fixed inset-0 z-[200] bg-primary"
+          className={`fixed inset-0 z-[200] ${
+            isTinyExplorers 
+              ? 'bg-gradient-to-b from-amber-100 via-orange-100 to-pink-100' 
+              : 'bg-gradient-to-b from-primary/90 to-accent/90'
+          }`}
         />
+        {/* Decorative elements for Tiny Explorers */}
+        {isTinyExplorers && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="fixed inset-0 z-[201] flex items-center justify-center pointer-events-none"
+          >
+            <motion.div
+              animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="text-8xl"
+            >
+              ✨
+            </motion.div>
+          </motion.div>
+        )}
         {/* Secondary overlay for depth */}
         <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          exit={{ scaleX: 0 }}
+          initial={{ scaleY: 0, originY: 0 }}
+          animate={{ scaleY: 1 }}
+          exit={{ scaleY: 0, originY: 1 }}
           transition={{ 
-            duration: 0.4, 
+            duration: 0.5, 
             delay: 0.05,
-            ease: [0.25, 0.46, 0.45, 0.94],
+            ease: [0.22, 1, 0.36, 1],
           }}
-          style={{ transformOrigin: 'left' }}
-          className="fixed inset-0 z-[199] bg-primary/50"
+          className={`fixed inset-0 z-[199] ${
+            isTinyExplorers 
+              ? 'bg-gradient-to-b from-yellow-50 to-orange-50' 
+              : 'bg-primary/30'
+          }`}
         />
       </>
     )}
@@ -160,6 +215,11 @@ const AnimatedRoutes: React.FC = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const isFirstRender = useRef(true);
   const previousPath = useRef(location.pathname);
+
+  // Check if navigating to/from Tiny Explorers
+  const isTinyExplorersTransition = 
+    location.pathname === '/tiny-explorers' || 
+    previousPath.current === '/tiny-explorers';
 
   // Initial loading
   useEffect(() => {
@@ -174,12 +234,14 @@ const AnimatedRoutes: React.FC = () => {
   useEffect(() => {
     if (!isLoading && !isFirstRender.current && previousPath.current !== location.pathname) {
       setShowOverlay(true);
-      const timer = setTimeout(() => setShowOverlay(false), 400);
+      // Longer transition for Tiny Explorers for smoother theme blend
+      const duration = isTinyExplorersTransition ? 600 : 450;
+      const timer = setTimeout(() => setShowOverlay(false), duration);
       previousPath.current = location.pathname;
       return () => clearTimeout(timer);
     }
     previousPath.current = location.pathname;
-  }, [location.pathname, isLoading]);
+  }, [location.pathname, isLoading, isTinyExplorersTransition]);
 
   return (
     <>
@@ -192,7 +254,10 @@ const AnimatedRoutes: React.FC = () => {
       </AnimatePresence>
 
       {/* Transition Overlay */}
-      <TransitionOverlay isVisible={showOverlay} />
+      <TransitionOverlay 
+        isVisible={showOverlay} 
+        isTinyExplorers={isTinyExplorersTransition} 
+      />
 
       {/* Routes with AnimatePresence for exit animations */}
       <AnimatePresence mode="wait">
@@ -250,7 +315,7 @@ const AnimatedRoutes: React.FC = () => {
             <Route
               path="/tiny-explorers"
               element={
-                <AnimatedPage variant="fadeScale">
+                <AnimatedPage variant="tinyExplorers">
                   <TinyExplorers />
                 </AnimatedPage>
               }
