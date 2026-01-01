@@ -26,47 +26,63 @@ const TinyExplorersPreview: React.FC = () => {
   const rainbowY = useTransform(scrollYProgress, [0, 1], ['20%', '-20%']);
 
   return (
-    <section ref={sectionRef} className="py-16 md:py-24 bg-tiny-bg relative overflow-hidden">
-      {/* Parallax Decorations */}
-      <motion.div
-        style={{ y: starY }}
-        className="absolute top-10 left-10 text-4xl md:text-6xl hidden sm:block"
-      >
-        <motion.span
-          animate={{ rotate: [0, 20, 0], scale: [1, 1.2, 1] }}
-          transition={{ duration: 4, repeat: Infinity }}
-        >
-          ⭐
-        </motion.span>
-      </motion.div>
-      <motion.div
-        style={{ y: rainbowY }}
-        className="absolute bottom-10 right-10 text-4xl md:text-6xl hidden sm:block"
-      >
-        <motion.span
-          animate={{ rotate: [0, -10, 0], y: [0, -10, 0] }}
-          transition={{ duration: 5, repeat: Infinity }}
-        >
-          🌈
-        </motion.span>
-      </motion.div>
-      <motion.div
-        animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
-        transition={{ duration: 3, repeat: Infinity }}
-        className="absolute top-1/3 right-1/4 text-3xl md:text-4xl hidden lg:block"
-      >
-        🎈
-      </motion.div>
-      <motion.div
-        animate={{ scale: [1, 1.3, 1], rotate: [0, -5, 0] }}
-        transition={{ duration: 2.5, repeat: Infinity }}
-        className="absolute bottom-1/4 left-1/4 text-2xl md:text-3xl hidden lg:block"
-      >
-        🦋
-      </motion.div>
+    <section ref={sectionRef} className="relative overflow-hidden">
+      {/* Smooth gradient transition from main theme */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/50 to-transparent z-10 pointer-events-none" />
+      
+      {/* Main background with soft gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-amber-50/30 dark:via-amber-900/10 to-amber-50/80 dark:to-amber-900/20" />
+      
+      {/* Subtle pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
+          backgroundSize: '32px 32px',
+        }}
+      />
 
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+      <div className="relative py-16 md:py-24">
+        {/* Parallax Decorations */}
+        <motion.div
+          style={{ y: starY }}
+          className="absolute top-10 left-10 text-4xl md:text-6xl hidden sm:block"
+        >
+          <motion.span
+            animate={{ rotate: [0, 20, 0], scale: [1, 1.2, 1] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          >
+            ⭐
+          </motion.span>
+        </motion.div>
+        <motion.div
+          style={{ y: rainbowY }}
+          className="absolute bottom-10 right-10 text-4xl md:text-6xl hidden sm:block"
+        >
+          <motion.span
+            animate={{ rotate: [0, -10, 0], y: [0, -10, 0] }}
+            transition={{ duration: 5, repeat: Infinity }}
+          >
+            🌈
+          </motion.span>
+        </motion.div>
+        <motion.div
+          animate={{ y: [0, -20, 0], rotate: [0, 10, 0] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="absolute top-1/3 right-1/4 text-3xl md:text-4xl hidden lg:block"
+        >
+          🎈
+        </motion.div>
+        <motion.div
+          animate={{ scale: [1, 1.3, 1], rotate: [0, -5, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity }}
+          className="absolute bottom-1/4 left-1/4 text-2xl md:text-3xl hidden lg:block"
+        >
+          🦋
+        </motion.div>
+
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Content */}
           <ScrollReveal animation="slideLeft">
             <div>
@@ -174,6 +190,10 @@ const TinyExplorersPreview: React.FC = () => {
           </StaggerContainer>
         </div>
       </div>
+      </div>
+      
+      {/* Smooth gradient transition to next section */}
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/50 to-transparent z-10 pointer-events-none" />
     </section>
   );
 };
