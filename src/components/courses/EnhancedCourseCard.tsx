@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Clock, Users, Star, BookOpen, Calendar, Play, Info } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { Heart, Clock, Users, Star, BookOpen, Play, Info, Sparkles } from 'lucide-react';
 import { Course } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,23 +21,74 @@ const EnhancedCourseCard: React.FC<EnhancedCourseCardProps> = ({
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // 3D tilt effect
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springConfig = { stiffness: 300, damping: 30 };
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    mouseX.set((e.clientX - rect.left - rect.width / 2) / rect.width);
+    mouseY.set((e.clientY - rect.top - rect.height / 2) / rect.height);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    mouseX.set(0);
+    mouseY.set(0);
+  };
 
   const levelColors = {
-    beginner: 'bg-green-500/10 text-green-700 dark:text-green-400',
-    intermediate: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400',
-    advanced: 'bg-red-500/10 text-red-700 dark:text-red-400'
+    beginner: 'bg-success/15 text-success border border-success/20',
+    intermediate: 'bg-warning/15 text-warning border border-warning/20',
+    advanced: 'bg-destructive/15 text-destructive border border-destructive/20'
   };
 
   return (
     <>
       <motion.div
+        ref={cardRef}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -8 }}
-        onHoverStart={() => setIsHovered(true)}
-        onHoverEnd={() => setIsHovered(false)}
-        className="group relative bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-border"
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: 'preserve-3d',
+          perspective: 1000,
+        }}
+        className="group relative overflow-hidden transition-all duration-500 will-change-transform"
       >
+        {/* Animated gradient border */}
+        <motion.div
+          className="absolute -inset-[1px] rounded-2xl z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)))',
+            backgroundSize: '200% 200%',
+          }}
+          animate={isHovered ? { backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'] } : {}}
+          transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        />
+
+        {/* Glow effect */}
+        <motion.div
+          className="absolute -inset-4 rounded-3xl pointer-events-none z-0"
+          animate={{ opacity: isHovered ? 0.4 : 0 }}
+          style={{
+            background: 'radial-gradient(circle at center, hsl(var(--primary) / 0.3), transparent 70%)',
+            filter: 'blur(20px)',
+          }}
+        />
+
+        {/* Main card content */}
+        <div className="relative z-10 bg-gradient-to-br from-card via-card to-secondary/10 rounded-2xl border border-border/50 backdrop-blur-sm overflow-hidden shadow-xl group-hover:shadow-2xl transition-shadow duration-500">
         {/* Wishlist Heart Button */}
         <motion.button
           whileHover={{ scale: 1.1 }}
@@ -185,18 +236,32 @@ const EnhancedCourseCard: React.FC<EnhancedCourseCardProps> = ({
           </div>
         </div>
 
-        {/* Animated Border Glow */}
-        <motion.div
-          animate={{
-            opacity: isHovered ? 1 : 0
-          }}
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{
-            background: 'linear-gradient(135deg, transparent, rgba(var(--primary), 0.1), transparent)',
-            border: '2px solid transparent',
-            backgroundClip: 'padding-box'
-          }}
-        />
+          {/* Shimmer effect on hover */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none z-20"
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={isHovered ? { x: '200%', opacity: [0, 0.5, 0] } : { x: '-100%', opacity: 0 }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.1) 50%, transparent 100%)',
+              width: '50%',
+            }}
+          />
+
+          {/* Corner sparkle */}
+          <AnimatePresence>
+            {isHovered && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0 }}
+                className="absolute top-3 right-14 z-30"
+              >
+                <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
       {/* Course Details Modal */}
